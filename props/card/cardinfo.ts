@@ -1,5 +1,5 @@
 const cardInfo = {
   title: "Coming Soon",
-  description: "Card description",
+  description: "Fireblog - your blog app",
 };
 export default cardInfo;
