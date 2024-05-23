@@ -2,14 +2,20 @@ import React from "react";
 import { MaxWidthWrapper } from "../utils/MaxWidthWrapper";
 import { FaFire } from "react-icons/fa";
 import { SiLinkedin, SiGithub } from "react-icons/si";
+import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import Link from "next/link";
 
 export const HeroFooter = () => {
   return (
-    <footer className="relative overflow-hidden py-12 text-center">
+    <motion.footer
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 1.3, ease: "easeInOut" }}
+      className=" overflow-hidden py-12 text-center "
+    >
       <div className="mx-auto max-w-6xl">
-        <MaxWidthWrapper className="grid grid-cols-12 gap-x-1.5 gap-y-6">
+        <MaxWidthWrapper className="relative grid grid-cols-12 gap-x-1.5 gap-y-6">
           <div className="col-span-6 md:col-span-4 md:col-start-3">
             <LogoColumn />
           </div>
@@ -32,7 +38,7 @@ export const HeroFooter = () => {
           </div>
         </MaxWidthWrapper>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

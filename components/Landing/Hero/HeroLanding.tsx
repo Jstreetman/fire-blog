@@ -1,7 +1,11 @@
 "use client";
-import React, { ReactNode, ButtonHTMLAttributes } from "react";
+import React, {
+  ReactNode,
+  ButtonHTMLAttributes,
+  AnchorHTMLAttributes,
+} from "react";
 import { motion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiGithub, FiLinkedin } from "react-icons/fi";
 import { twMerge } from "tailwind-merge";
 
 export const HeroLanding = () => {
@@ -77,15 +81,58 @@ export const HeroLanding = () => {
         }}
         className="flex flex-col items-center gap-6 sm:flex-row"
       >
-        <SplashButton className="flex items-center gap-2">
+        <SocialButton
+          href="https://github.com/Jstreetman/fire-blog"
+          target="_blank"
+          className="flex items-center gap-2"
+        >
           Fork Project
           <FiArrowRight />
-        </SplashButton>
-        {/* <GhostButton className="rounded-md px-4 py-2 text-zinc-100">
-          
-        </GhostButton> */}
+        </SocialButton>
+        <SocialButton
+          className="flex items-center gap-2"
+          target="_blank"
+          href="https://github.com/Jstreetman"
+        >
+          GitHub
+          <FiGithub />
+        </SocialButton>
+        <SocialButton
+          className="flex items-center gap-2"
+          target="_blank"
+          href="https://www.linkedin.com/in/jonathan-streetman-483267287/"
+        >
+          LinkedIn
+          <FiLinkedin />
+        </SocialButton>
       </motion.div>
     </div>
+  );
+};
+
+const SocialButton = ({
+  children,
+  href,
+  className,
+  ...rest
+}: {
+  children: ReactNode;
+  href: string;
+  className?: string;
+} & AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  return (
+    <a
+      href={href}
+      className={twMerge(
+        "rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70",
+        className
+      )}
+      target="_blank"
+      rel="noopener noreferrer"
+      {...rest}
+    >
+      {children}
+    </a>
   );
 };
 
@@ -103,21 +150,7 @@ const SplashButton = ({ children, className, ...rest }: ButtonProps) => {
   );
 };
 
-const GhostButton = ({ children, className, ...rest }: ButtonProps) => {
-  return (
-    <button
-      className={twMerge(
-        "rounded-md px-4 py-2 text-zinc-100 transition-all hover:scale-[1.02] hover:bg-zinc-800 hover:text-zinc-50 active:scale-[0.98]",
-        className
-      )}
-      {...rest}
-    >
-      {children}
-    </button>
-  );
-};
-
 type ButtonProps = {
   children: ReactNode;
   className?: string;
-} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "ref">;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
