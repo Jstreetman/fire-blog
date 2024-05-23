@@ -2,11 +2,15 @@
 import React, { useEffect, useState } from "react";
 import { AnimationProps, motion } from "framer-motion";
 import { Cards } from "../Cards/Cards";
+import Navbar from "../Landing/Navbar";
+import { HeroLanding } from "../Landing/Hero/HeroLanding";
 
 export const LandingAnimation = () => {
   return (
     <section className="relative overflow-hidden">
       <Content />
+      <Navbar />
+
       <Beams />
       <GradientGrid />
     </section>
@@ -16,10 +20,10 @@ export const LandingAnimation = () => {
 const Content = () => {
   return (
     <div
-      className="relative z-20 mx-auto flex h-screen max-w-6xl flex-col items-center justify-center px-4 py-24 md:px-8 md:py-36 "
+      className=" z-20 mx-auto flex max-w-6xl h-screen flex-col items-center justify-center px-4  md:px-8 md:py-8 "
       style={{ minHeight: `calc(100vh - 2rem)` }}
     >
-      <Cards />
+      <HeroLanding />
     </div>
   );
 };
