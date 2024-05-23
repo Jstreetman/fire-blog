@@ -6,7 +6,7 @@ import { twMerge } from "tailwind-merge";
 
 export const DarkGridHero = (props: any) => {
   return (
-    <section className="relative overflow-hidden bg-zinc-950">
+    <section className="relative overflow-hidden bg-zinc-950 ">
       <Content />
       <Beams />
       <GradientGrid />
@@ -16,7 +16,10 @@ export const DarkGridHero = (props: any) => {
 
 const Content = () => {
   return (
-    <div className="relative z-20 mx-auto flex max-w-6xl flex-col items-center justify-center px-4 py-24 md:px-8 md:py-36">
+    <div
+      className="relative z-20 mx-auto flex h-screen max-w-6xl flex-col items-center justify-center px-4 py-24 md:px-8 md:py-36 "
+      style={{ minHeight: `calc(100vh - 2rem)` }}
+    >
       <motion.div
         initial={{
           y: 25,
@@ -136,13 +139,13 @@ const GhostButton = ({ children, className, ...rest }: ButtonProps) => {
 };
 
 const Beams = () => {
-  const { width } = useWindowSize();
+  const { height } = useWindowSize();
 
-  const numColumns = width ? Math.floor(width / GRID_BOX_SIZE) : 0;
+  const numColumns = height ? Math.floor(height / GRID_BOX_SIZE) : 0;
 
   const placements = [
     {
-      top: GRID_BOX_SIZE * 0,
+      top: 0,
       left: Math.floor(numColumns * 0.05) * GRID_BOX_SIZE,
       transition: {
         duration: 3.5,
@@ -151,7 +154,7 @@ const Beams = () => {
       },
     },
     {
-      top: GRID_BOX_SIZE * 12,
+      top: 0,
       left: Math.floor(numColumns * 0.15) * GRID_BOX_SIZE,
       transition: {
         duration: 3.5,
@@ -160,11 +163,11 @@ const Beams = () => {
       },
     },
     {
-      top: GRID_BOX_SIZE * 3,
+      top: 0,
       left: Math.floor(numColumns * 0.25) * GRID_BOX_SIZE,
     },
     {
-      top: GRID_BOX_SIZE * 9,
+      top: 0,
       left: Math.floor(numColumns * 0.75) * GRID_BOX_SIZE,
       transition: {
         duration: 2,
@@ -182,7 +185,7 @@ const Beams = () => {
       },
     },
     {
-      top: GRID_BOX_SIZE * 2,
+      top: 0,
       left: Math.floor(numColumns * 1) * GRID_BOX_SIZE - GRID_BOX_SIZE,
       transition: {
         duration: 5,
