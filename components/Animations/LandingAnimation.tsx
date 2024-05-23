@@ -22,7 +22,7 @@ export const LandingAnimation = () => {
 const Content = () => {
   return (
     <div
-      className=" z-20 mx-auto flex max-w-6xl h-fit flex-col items-center justify-center px-4  md:px-8 md:py-8 "
+      className=" z-20 mx-auto flex max-w-6xl h-screen flex-col items-center justify-center px-4  md:px-8 md:py-8 "
       style={{ minHeight: `calc(100vh - 2rem)` }}
     >
       <HeroLanding />
