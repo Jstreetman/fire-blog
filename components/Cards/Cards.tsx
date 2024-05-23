@@ -1,5 +1,5 @@
 import CardDesign from "./CardDesign";
-import CardInfo from "../../card/cardinfo";
+import CardInfo from "../../props/card/cardinfo";
 
 export const Cards = () => {
   return (
