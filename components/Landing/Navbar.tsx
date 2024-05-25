@@ -3,6 +3,7 @@ import { useAnimate, motion, AnimationScope } from "framer-motion";
 import { FiMenu, FiArrowUpRight } from "react-icons/fi";
 import useMeasure from "react-use-measure";
 import { FaFire } from "react-icons/fa";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
@@ -141,9 +142,12 @@ const Buttons = ({
       <SignInButton />
     </div>
 
-    <button className="relative scale-100 overflow-hidden rounded-lg bg-gradient-to-br from-blue-600 from-40% to-blue-400 px-4 py-2 font-medium text-white transition-transform hover:scale-105 active:scale-95">
+    <Link
+      href="/signup"
+      className="relative scale-100 overflow-hidden rounded-lg bg-gradient-to-br from-blue-600 from-40% to-blue-400 px-4 py-2 font-medium text-white transition-transform hover:scale-105 active:scale-95"
+    >
       Sign Up
-    </button>
+    </Link>
 
     <button
       onClick={() => setMenuOpen((pv) => !pv)}
@@ -156,12 +160,15 @@ const Buttons = ({
 
 const SignInButton = () => {
   return (
-    <button className="group relative scale-100 overflow-hidden rounded-lg px-4 py-2 transition-transform hover:scale-105 active:scale-95">
+    <Link
+      href="/signin"
+      className="group relative scale-100 overflow-hidden rounded-lg px-4 py-2 transition-transform hover:scale-105 active:scale-95"
+    >
       <span className="relative z-10 text-white/90 transition-colors group-hover:text-white">
         Sign in
       </span>
-      <span className="absolute inset-0 z-0 bg-gradient-to-br from-white/20 to-white/5 opacity-0 transition-opacity group-hover:opacity-100" />
-    </button>
+      <span className="absolute inset-0 z-0 bg-gradient-to-br from-white/20 rounded-lg to-white/5 opacity-0 transition-opacity group-hover:opacity-100" />
+    </Link>
   );
 };
 
