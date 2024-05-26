@@ -76,7 +76,7 @@ const Heading = () => (
 );
 
 const SocialOptions = () => (
-  <div>
+  <div className="invisible">
     <div className="mb-3 flex gap-3">
       <BubbleButton className="flex w-full justify-center py-3">
         <SiTwitter />
@@ -105,13 +105,35 @@ const Email = () => {
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <div className="mb-3">
+        <label htmlFor="username-input" className="mb-1.5 block text-zinc-400">
+          Username
+        </label>
+        <input
+          id="username-input"
+          type="text"
+          placeholder="Create Username..."
+          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="fullname-input" className="mb-1.5 block text-zinc-400">
+          Full Name
+        </label>
+        <input
+          id="fullname-input"
+          type="text"
+          placeholder="Your Name..."
+          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+        />
+      </div>
+      <div className="mb-3">
         <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
           Email
         </label>
         <input
           id="email-input"
           type="email"
-          placeholder="your.email@provider.com"
+          placeholder="Email..."
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
       </div>

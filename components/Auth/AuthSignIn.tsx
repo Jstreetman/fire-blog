@@ -108,7 +108,7 @@ const Email = () => {
         <input
           id="email-input"
           type="email"
-          placeholder="your.email@provider.com"
+          placeholder="Email..."
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
       </div>
