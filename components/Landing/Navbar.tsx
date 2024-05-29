@@ -105,22 +105,22 @@ const Logo = () => (
 
 const Links = () => (
   <div className="hidden items-center gap-2 md:flex">
-    <GlassLink text="About" />
-    <GlassLink text="Contact" />
+    <GlassLink text="About" href="/about" />
+    <GlassLink text="Contact" href="/contact" />
   </div>
 );
 
-const GlassLink = ({ text }: { text: string }) => {
+const GlassLink = ({ text, href }: { text: string; href: string }) => {
   return (
-    <a
-      href="#"
+    <Link
+      href={href}
       className="group relative scale-100 overflow-hidden rounded-lg px-4 py-2 transition-transform hover:scale-105 active:scale-95"
     >
       <span className="relative z-10 text-white/90 transition-colors group-hover:text-white">
         {text}
       </span>
       <span className="absolute inset-0 z-0 bg-gradient-to-br from-white/20 to-white/5 opacity-0 transition-opacity group-hover:opacity-100" />
-    </a>
+    </Link>
   );
 };
 
