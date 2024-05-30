@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { ref, set, get } from "firebase/database";
 import { getDatabase } from "firebase/database";
 import bcrypt from "bcryptjs-react";
+// import { UserInterface } from "../../../interfaces/UserInterface";
 import { app } from "../config";
 
 const auth = getAuth(app);

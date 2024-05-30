@@ -24,21 +24,31 @@ export const AuthSignUp = () => {
     const email = (e.target as any).elements.email.value;
     const password = (e.target as any).elements.password.value;
 
+    if (!email || !password) {
+      setErrorMessage(SignUpError.EmptyFields);
+      setShowErrorModal(true);
+      return;
+    }
+
     try {
       const { result, error } = await signUp(auth, email, password);
       if (error) {
         if (error === SignUpError.EmailAlreadyInUse) {
           setErrorMessage(SignUpError.EmailAlreadyInUse);
+          console.log(SignUpError.EmailAlreadyInUse);
         } else if (error === SignUpError.WeakPassword) {
           setErrorMessage(SignUpError.WeakPassword);
+          console.log(SignUpError.WeakPassword);
         } else if (error === SignUpError.InvalidCredentials) {
           setErrorMessage(SignUpError.InvalidCredentials);
+          console.log(SignUpError.InvalidCredentials);
         } else {
           setErrorMessage(error.message);
         }
         setShowErrorModal(true);
       } else {
-        setErrorMessage(Success.SuccessMessage);
+        setShowSuccessMessage(Success.SuccessMessage);
+        console.log(Success.SuccessMessage);
         setShowSuccessModal(true);
       }
     } catch (error) {
@@ -173,7 +183,6 @@ const Email = () => {
           id="email-input"
           type="email"
           name="email"
-          required
           placeholder="Email..."
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
@@ -186,7 +195,6 @@ const Email = () => {
           id="password-input"
           type="password"
           name="password"
-          required
           placeholder="••••••••••••"
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
