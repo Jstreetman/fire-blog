@@ -1,13 +1,45 @@
 "use client";
-import React, { ReactNode } from "react";
-import { SiGithub, SiTwitter } from "react-icons/si";
-import { FiArrowLeft } from "react-icons/fi";
-import { motion } from "framer-motion";
-import { FaFire } from "react-icons/fa";
-import { twMerge } from "tailwind-merge";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-
+import { FaFire } from "react-icons/fa";
+import { FiArrowLeft } from "react-icons/fi";
+import { twMerge } from "tailwind-merge";
+import { createUserWithEmailAndPassword } from "firebase/auth"; // Import createUserWithEmailAndPassword
+import { auth } from "../../app/firebase/config"; // Adjust the path as necessary
+import { GridAnimation } from "../Animations/GridAnimation";
+import { SignUpError } from "../../enums/AuthEnums";
+import { Success } from "../../enums/AuthEnums";
 export const AuthSignUp = () => {
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setShowSuccessMessage] = useState("");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = (e.target as any).elements.email.value;
+    const password = (e.target as any).elements.password.value;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      setShowSuccessMessage(Success.SuccessMessage);
+      setShowSuccessModal(true);
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        setErrorMessage(SignUpError.EmailAlreadyInUse);
+        setShowErrorModal(true);
+      } else if (error.code === "auth/weak-password") {
+        setErrorMessage(SignUpError.WeakPassword);
+        setShowErrorModal(true);
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMessage(SignUpError.InvalidCredentials);
+        setShowErrorModal(true);
+      } else {
+        setErrorMessage(error.message);
+      }
+    }
+  };
   return (
     <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
       <motion.div
@@ -22,7 +54,7 @@ export const AuthSignUp = () => {
           ease: "easeInOut",
         }}
       >
-        <Link href="/" className="absolute left-4 top-6 text-sm">
+        <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
             Home
@@ -43,17 +75,66 @@ export const AuthSignUp = () => {
           duration: 1.25,
           ease: "easeInOut",
         }}
-        className="relative z-10 mx-auto w-full max-w-xl p-4"
+        className="relative z-10 mx-auto w-full max-w-xl p-4 "
       >
         <Heading />
 
-        {/* <SocialOptions /> */}
-        {/* <Or /> */}
-        <Email />
-        <Terms />
+        <form onSubmit={handleSignUp}>
+          <Email />
+          <Terms />
+          <SplashButton type="submit" className="w-full">
+            Sign Up
+          </SplashButton>
+        </form>
       </motion.div>
+      <GridAnimation />
 
-      <CornerGrid />
+      {/* <CornerGrid /> */}
+
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+          >
+            <div className="bg-blue-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
+              <h2 className="text-xl font-semibold">{successMessage}</h2>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-4 underline"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showErrorModal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+          >
+            <div className="bg-red-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
+              <h2 className="text-xl font-semibold">Error</h2>
+              <p className="mt-2">{errorMessage}</p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="mt-4 underline"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -75,57 +156,9 @@ const Heading = () => (
   </div>
 );
 
-const SocialOptions = () => (
-  <div className="invisible">
-    <div className="mb-3 flex gap-3">
-      <BubbleButton className="flex w-full justify-center py-3">
-        <SiTwitter />
-      </BubbleButton>
-      <BubbleButton className="flex w-full justify-center py-3">
-        <SiGithub />
-      </BubbleButton>
-    </div>
-    <BubbleButton className="flex w-full justify-center py-3">
-      Sign in with SSO
-    </BubbleButton>
-  </div>
-);
-
-const Or = () => {
-  return (
-    <div className="my-6 flex items-center gap-3">
-      <div className="h-[1px] w-full bg-zinc-700" />
-      <span className="text-zinc-400">OR</span>
-      <div className="h-[1px] w-full bg-zinc-700" />
-    </div>
-  );
-};
-
 const Email = () => {
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <div className="mb-3">
-        <label htmlFor="username-input" className="mb-1.5 block text-zinc-400">
-          Username
-        </label>
-        <input
-          id="username-input"
-          type="text"
-          placeholder="Create Username..."
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="fullname-input" className="mb-1.5 block text-zinc-400">
-          Full Name
-        </label>
-        <input
-          id="fullname-input"
-          type="text"
-          placeholder="Your Name..."
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
+    <>
       <div className="mb-3">
         <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
           Email
@@ -133,27 +166,24 @@ const Email = () => {
         <input
           id="email-input"
           type="email"
+          name="email"
           placeholder="Email..."
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
       </div>
       <div className="mb-6">
-        <div className="mb-1.5 flex items-end justify-between">
-          <label htmlFor="password-input" className="block text-zinc-400">
-            Password
-          </label>
-        </div>
+        <label htmlFor="password-input" className="block text-zinc-400">
+          Password
+        </label>
         <input
           id="password-input"
           type="password"
+          name="password"
           placeholder="••••••••••••"
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
       </div>
-      <SplashButton type="submit" className="w-full">
-        Sign Up
-      </SplashButton>
-    </form>
+    </>
   );
 };
 
@@ -174,7 +204,7 @@ const SplashButton = ({ children, className, ...rest }: ButtonProps) => {
   return (
     <button
       className={twMerge(
-        "rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70",
+        "rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70 mt-4",
         className
       )}
       {...rest}
@@ -233,14 +263,10 @@ const CornerGrid = () => {
 };
 
 const NavLogo = () => {
-  return (
-    // <div href="#">
-    <FaFire className="h-6 w-6 text-blue-400" />
-    // </div>
-  );
+  return <FaFire className="h-6 w-6 text-blue-400" />;
 };
 
 type ButtonProps = {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;

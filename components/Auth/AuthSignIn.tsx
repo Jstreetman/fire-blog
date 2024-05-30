@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 import { FaFire } from "react-icons/fa";
 import Link from "next/link";
+import { GridAnimation } from "../Animations/GridAnimation";
 
 export const AuthSignIn = () => {
   return (
@@ -22,7 +23,7 @@ export const AuthSignIn = () => {
           ease: "easeInOut",
         }}
       >
-        <Link href="/" className="absolute left-4 top-6 text-sm">
+        <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
             Home
@@ -53,7 +54,9 @@ export const AuthSignIn = () => {
         <Terms />
       </motion.div>
 
-      <CornerGrid />
+      <GridAnimation />
+
+      {/* <CornerGrid /> */}
     </div>
   );
 };
