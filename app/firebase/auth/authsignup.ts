@@ -14,7 +14,7 @@ const encodeEmail = (email) => {
   return email.replace(/\./g, ",");
 };
 
-export default async function signUp(email, password) {
+export default async function signUp(auth, email, password) {
   let result = null,
     error = null;
   try {

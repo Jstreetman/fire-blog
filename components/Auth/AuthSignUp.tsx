@@ -5,16 +5,19 @@ import Link from "next/link";
 import { FaFire } from "react-icons/fa";
 import { FiArrowLeft } from "react-icons/fi";
 import { twMerge } from "tailwind-merge";
-import { createUserWithEmailAndPassword } from "firebase/auth"; // Import createUserWithEmailAndPassword
-import { auth } from "../../app/firebase/config"; // Adjust the path as necessary
+import { auth } from "@/app/firebase/config";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { GridAnimation } from "../Animations/GridAnimation";
 import { SignUpError } from "../../enums/AuthEnums";
 import { Success } from "../../enums/AuthEnums";
+import signUp from "@/app/firebase/auth/authsignup";
 export const AuthSignUp = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setShowSuccessMessage] = useState("");
+  const [createUserWithEmailAndPassword] =
+    useCreateUserWithEmailAndPassword(auth);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,22 +25,25 @@ export const AuthSignUp = () => {
     const password = (e.target as any).elements.password.value;
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setShowSuccessMessage(Success.SuccessMessage);
-      setShowSuccessModal(true);
-    } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        setErrorMessage(SignUpError.EmailAlreadyInUse);
-        setShowErrorModal(true);
-      } else if (error.code === "auth/weak-password") {
-        setErrorMessage(SignUpError.WeakPassword);
-        setShowErrorModal(true);
-      } else if (error.code === "auth/invalid-email") {
-        setErrorMessage(SignUpError.InvalidCredentials);
+      const { result, error } = await signUp(auth, email, password);
+      if (error) {
+        if (error === SignUpError.EmailAlreadyInUse) {
+          setErrorMessage(SignUpError.EmailAlreadyInUse);
+        } else if (error === SignUpError.WeakPassword) {
+          setErrorMessage(SignUpError.WeakPassword);
+        } else if (error === SignUpError.InvalidCredentials) {
+          setErrorMessage(SignUpError.InvalidCredentials);
+        } else {
+          setErrorMessage(error.message);
+        }
         setShowErrorModal(true);
       } else {
-        setErrorMessage(error.message);
+        setErrorMessage(Success.SuccessMessage);
+        setShowSuccessModal(true);
       }
+    } catch (error) {
+      setErrorMessage(error.message);
+      setShowErrorModal(true);
     }
   };
   return (
@@ -167,6 +173,7 @@ const Email = () => {
           id="email-input"
           type="email"
           name="email"
+          required
           placeholder="Email..."
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
@@ -179,6 +186,7 @@ const Email = () => {
           id="password-input"
           type="password"
           name="password"
+          required
           placeholder="••••••••••••"
           className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
         />
