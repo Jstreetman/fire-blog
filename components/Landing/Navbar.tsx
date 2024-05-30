@@ -1,3 +1,4 @@
+"use client";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useAnimate, motion, AnimationScope } from "framer-motion";
 import { FiMenu, FiArrowUpRight } from "react-icons/fi";
@@ -25,28 +26,30 @@ const GlassNavigation = () => {
   const [scope, animate] = useAnimate();
   const navRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseMove = ({ offsetX, offsetY, target }: MouseEvent) => {
-    // @ts-ignore
-    const isNavElement = [...target.classList].includes("glass-nav");
-
-    if (isNavElement) {
-      setHovered(true);
-
-      const top = offsetY + "px";
-      const left = offsetX + "px";
-
-      animate(scope.current, { top, left }, { duration: 0 });
-    } else {
-      setHovered(false);
-    }
-  };
-
   useEffect(() => {
-    navRef.current?.addEventListener("mousemove", handleMouseMove);
+    const navElement = navRef.current;
+    const handleMouseMove = ({ offsetX, offsetY, target }: MouseEvent) => {
+      // @ts-ignore
+      const isNavElement = [...target.classList].includes("glass-nav");
 
-    return () =>
-      navRef.current?.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+      if (isNavElement) {
+        setHovered(true);
+
+        const top = offsetY + "px";
+        const left = offsetX + "px";
+
+        animate(scope.current, { top, left }, { duration: 0 });
+      } else {
+        setHovered(false);
+      }
+    };
+
+    navElement?.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      navElement?.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [animate, scope]);
 
   return (
     <nav
@@ -124,11 +127,14 @@ const GlassLink = ({ text, href }: { text: string; href: string }) => {
   );
 };
 
-const TextLink = ({ text }: { text: string }) => {
+const TextLink = ({ text, href }: { text: string; href: string }) => {
   return (
-    <a href="#" className="text-white/90 transition-colors hover:text-white">
+    <Link
+      href={href}
+      className="text-white/90 transition-colors hover:text-white"
+    >
       {text}
-    </a>
+    </Link>
   );
 };
 
@@ -184,8 +190,8 @@ const MobileMenu = ({ menuOpen }: { menuOpen: boolean }) => {
     >
       <div ref={ref} className="flex items-center justify-between px-4 pb-4">
         <div className="flex items-center gap-4">
-          <TextLink text="About" />
-          <TextLink text="Contact" />
+          <TextLink href="/about" text="About" />
+          <TextLink href="/contact" text="Contact" />
         </div>
         <SignInButton />
       </div>
