@@ -1,16 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { AnimationProps, motion } from "framer-motion";
-
-export const GridAnimation = () => {
-  return <section className=" "></section>;
+export const GridBeamAnimation = () => {
+  return (
+    <section className=" overflow-hidden">
+      {/* <Content /> */}
+      <Beams />
+      <GradientGrid />
+    </section>
+  );
 };
 
 const Content = () => {
   return (
     <div
-      className=" z-20 mx-auto flex max-w-6xl h-screen  flex-col items-center justify-center px-4  md:px-8 md:py-8 "
-      style={{ minHeight: `calc(100vh - 2rem)` }}
+      className=" z-20 mx-auto flex max-w-6xl  flex-col items-center justify-center px-4  md:px-8 md:py-8 "
+      // style={{ minHeight: `calc(100vh - 2rem)` }}
     />
   );
 };
@@ -41,11 +46,11 @@ const Beams = () => {
     },
     {
       top: GRID_BOX_SIZE * 3,
-      left: Math.floor(numColumns * 0.25) * GRID_BOX_SIZE,
+      left: Math.floor(numColumns * 0.5) * GRID_BOX_SIZE,
     },
     {
       top: GRID_BOX_SIZE * 9,
-      left: Math.floor(numColumns * 0.75) * GRID_BOX_SIZE,
+      left: Math.floor(numColumns * 1) * GRID_BOX_SIZE,
       transition: {
         duration: 2,
         repeatDelay: 7.5,
@@ -136,8 +141,6 @@ const Beam = ({ top, left, transition = {} }: BeamType) => {
 };
 
 const GradientGrid = () => {
-  const { height } = useWindowSize();
-
   return (
     <motion.div
       initial={{
@@ -147,23 +150,23 @@ const GradientGrid = () => {
         opacity: 1,
       }}
       transition={{
-        duration: 1.5,
+        duration: 2.5,
         ease: "easeInOut",
       }}
-      className=" inset-0 z-0 "
+      className="absolute inset-0 z-0"
     >
       <div
         style={{
           backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='rgb(30 58 138 / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`,
         }}
-        className="absolute inset-0 z-0  "
+        className="absolute inset-0 z-0"
       />
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-zinc-950/0 to-zinc-950 " />
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-zinc-950/0 to-zinc-950" />
     </motion.div>
   );
 };
 
-const GRID_BOX_SIZE = 64;
+const GRID_BOX_SIZE = 32;
 const BEAM_WIDTH_OFFSET = 1;
 
 type WindowSize = {

@@ -2,171 +2,117 @@
 import React, { useEffect, useState, ReactNode } from "react";
 import { motion } from "framer-motion";
 import { AnimationProps } from "framer-motion";
-import CardDesign from "../Cards/CardDesign";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-
 import { FiArrowLeft } from "react-icons/fi";
+import { GridBeamAnimation } from "../Animations/GridBeamAnimation";
+import { FaFire } from "react-icons/fa";
+import { GridAnimation } from "../Animations/GridAnimation";
 
 const About = () => {
   return (
-    <section className="relative overflow-hidden">
-      <Content />
-      <Beams />
-      <GradientGrid />
-    </section>
-  );
-};
-
-const Content = () => {
-  return (
-    <div
-      className="relative z-20 mx-auto flex max-w-6xl h-screen flex-col items-center justify-center px-4  md:px-8 md:py-8 "
-      style={{ minHeight: `calc(100vh - 2rem)` }}
+    <section
+      style={{
+        backgroundImage:
+          "radial-gradient(100% 100% at 50% 0%, rgba(13,13,17,1), rgba(9,9,11,1))",
+      }}
+      className="relative overflow-hidden bg-zinc-950 text-zinc-200 selection:bg-zinc-600"
     >
       <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        transition={{
-          duration: 1.25,
-          ease: "easeInOut",
-        }}
+        initial={{ opacity: 0, x: 1000 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: "easeInOut", delay: 0.25 }}
       >
-        <Link href="/" className="absolute left-4 top-6 text-sm">
+        <Link href="/" className=" z-20 absolute left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
             Home
           </BubbleButton>
         </Link>
       </motion.div>
-      <motion.div className=" z-20">Coming Soon</motion.div>
+      <Content />
+
+      <GridAnimation />
+    </section>
+  );
+};
+
+const Content = () => {
+  return (
+    <div className=" z-20 mx-auto flex max-w-6xl flex-col  items-center px-4  md:px-8 md:py-8 ">
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 1000,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 1,
+          ease: "backInOut",
+          delay: 0.3,
+        }}
+        className="z-20"
+      >
+        <div className="py-36 z-20 flex flex-col justify-center items-center">
+          <FaFire className="text-9xl text-blue-500" />
+          <h1 className="py-10 text-3xl font-bold ">
+            About Fire<span className="text-blue-500">blog</span>
+          </h1>
+          <h2 className="text-2xl text-center">
+            We are a blogging app platform that helps you stay up to date. We
+            are a community of like minded individuals who want to share their
+            knowledge. We hope you enjoy our platform.
+          </h2>
+        </div>
+      </motion.div>
+      <motion.div
+        initial={{
+          opacity: 0,
+          // x: -1000,
+        }}
+        whileInView={{
+          opacity: 1,
+          // x: 0,
+          transition: { duration: 4, ease: "easeInOut", delay: 0.5 },
+        }}
+        viewport={{ once: true }}
+        className="py-32 z-20 flex flex-col justify-center items-center"
+      >
+        <h1 className="py-10 text-3xl font-bold text-center">Mission</h1>
+        <p className="text-2xl text-center">
+          {" "}
+          To establish a Platform for Knowledge Sharing.{" "}
+        </p>
+      </motion.div>
+      <motion.div
+        initial={{
+          opacity: 0,
+          x: -1000,
+        }}
+        whileInView={{
+          opacity: 1,
+          x: 0,
+          transition: { duration: 1, ease: "easeInOut", delay: 0.2 },
+        }}
+        viewport={{ once: true }}
+        className="py-32 z-20 flex flex-col justify-center items-center"
+      >
+        <h1 className="py-10 text-3xl font-bold text-center">Who are we</h1>
+        <p className="text-2xl text-center">
+          {" "}
+          We are a community of like minded individuals who want to share their
+          knowledge. We hope you enjoy our platform. Fireblog is a community of
+          like minded individuals who want to share their knowledge. We hope you
+          enjoy our platform.{" "}
+        </p>
+      </motion.div>
     </div>
   );
 };
 
-const Beams = () => {
-  const { width } = useWindowSize();
-
-  const numColumns = width ? Math.floor(width / GRID_BOX_SIZE) : 0;
-
-  const placements = [
-    {
-      top: GRID_BOX_SIZE * 0,
-      left: Math.floor(numColumns * 0.05) * GRID_BOX_SIZE,
-      transition: {
-        duration: 3.5,
-        repeatDelay: 5,
-        delay: 2,
-      },
-    },
-    {
-      top: GRID_BOX_SIZE * 12,
-      left: Math.floor(numColumns * 0.15) * GRID_BOX_SIZE,
-      transition: {
-        duration: 3.5,
-        repeatDelay: 10,
-        delay: 4,
-      },
-    },
-    {
-      top: GRID_BOX_SIZE * 3,
-      left: Math.floor(numColumns * 0.25) * GRID_BOX_SIZE,
-    },
-    {
-      top: GRID_BOX_SIZE * 9,
-      left: Math.floor(numColumns * 0.75) * GRID_BOX_SIZE,
-      transition: {
-        duration: 2,
-        repeatDelay: 7.5,
-        delay: 3.5,
-      },
-    },
-    {
-      top: 0,
-      left: Math.floor(numColumns * 0.7) * GRID_BOX_SIZE,
-      transition: {
-        duration: 3,
-        repeatDelay: 2,
-        delay: 1,
-      },
-    },
-    {
-      top: GRID_BOX_SIZE * 2,
-      left: Math.floor(numColumns * 1) * GRID_BOX_SIZE - GRID_BOX_SIZE,
-      transition: {
-        duration: 5,
-        repeatDelay: 5,
-        delay: 5,
-      },
-    },
-  ];
-
-  return (
-    <>
-      {placements.map((p, i) => (
-        <Beam
-          key={i}
-          top={p.top}
-          left={p.left - BEAM_WIDTH_OFFSET}
-          transition={p.transition || {}}
-        />
-      ))}
-    </>
-  );
-};
-
-const useWindowSize = () => {
-  const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: undefined,
-    height: undefined,
-  });
-
-  useEffect(() => {
-    const handleResize = () =>
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-
-    window.addEventListener("resize", handleResize);
-
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return windowSize;
-};
-
-const Beam = ({ top, left, transition = {} }: BeamType) => {
-  return (
-    <motion.div
-      initial={{
-        y: 0,
-        opacity: 0,
-      }}
-      animate={{
-        opacity: [0, 1, 0],
-        y: 32 * 8,
-      }}
-      transition={{
-        ease: "easeInOut",
-        duration: 3,
-        repeat: Infinity,
-        repeatDelay: 1.5,
-        ...transition,
-      }}
-      style={{
-        top,
-        left,
-      }}
-      className="absolute z-10 h-[64px] w-[1px] bg-gradient-to-b from-blue-500/0 to-blue-500"
-    />
-  );
-};
 const GradientGrid = () => {
   return (
     <motion.div
