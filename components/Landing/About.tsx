@@ -8,8 +8,14 @@ import { FiArrowLeft } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 
 const About = () => {
+  const { width } = useWindowSize();
+
   return (
-    <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
+    <div
+      className={`bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600 ${
+        width && width <= 768 ? "md:px-8" : "px-4"
+      }`}
+    >
       <motion.div
         initial={{
           opacity: 0,
@@ -36,7 +42,7 @@ const About = () => {
 
 const Content = () => {
   return (
-    <div className=" z-20 mx-auto flex max-w-6xl flex-col  items-center px-4  md:px-8 md:py-8 ">
+    <div className="mx-auto flex max-w-6xl flex-col items-center justify-center px-4  md:px-8 md:py-8 ">
       <motion.div
         initial={{
           opacity: 0,
@@ -53,7 +59,7 @@ const Content = () => {
         }}
         className="z-20"
       >
-        <div className="py-36 z-20 flex flex-col justify-center items-center">
+        <div className="py-20 z-20 flex flex-col justify-center items-center">
           <FaFire className="text-9xl text-blue-500" />
           <h1 className="py-10 text-3xl font-bold ">
             About Fire<span className="text-blue-500">blog</span>
@@ -142,10 +148,23 @@ type WindowSize = {
   height: number | undefined;
 };
 
-type BeamType = {
-  top: number;
-  left: number;
-  transition?: AnimationProps["transition"];
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = React.useState<WindowSize>({
+    width: undefined,
+    height: undefined,
+  });
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return windowSize;
 };
 
 const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
