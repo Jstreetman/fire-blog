@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import { AnimationProps, motion } from "framer-motion";
 
 export const GridAnimation = () => {
-  return <section className=" "></section>;
+  return (
+    <section className=" overflow-hidden">
+      {/* <Content /> */}
+      {/* <Beams /> */}
+      <GradientGrid />
+    </section>
+  );
 };
 
 const Content = () => {
@@ -150,7 +156,7 @@ const GradientGrid = () => {
         duration: 1.5,
         ease: "easeInOut",
       }}
-      className=" inset-0 z-0 "
+      className="absolute inset-0 z-0 "
     >
       <div
         style={{
@@ -158,7 +164,7 @@ const GradientGrid = () => {
         }}
         className="absolute inset-0 z-0  "
       />
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-zinc-950/0 to-zinc-950 " />
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-zinc-950/0 to-zinc-950" />
     </motion.div>
   );
 };

@@ -57,7 +57,7 @@ export const AuthSignUp = () => {
     }
   };
   return (
-    <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
+    <div className="bg-zinc-950 py-20 z-20 text-zinc-200 selection:bg-zinc-600">
       <motion.div
         initial={{
           opacity: 0,
@@ -156,7 +156,7 @@ export const AuthSignUp = () => {
 };
 
 const Heading = () => (
-  <div>
+  <div className="z-20">
     <NavLogo />
     <div className="mb-9 mt-6 space-y-1.5">
       <h1 className="text-2xl font-semibold">

@@ -1,29 +1,28 @@
 "use client";
-import React, { useEffect, useState, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { AnimationProps } from "framer-motion";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { FiArrowLeft } from "react-icons/fi";
-import { GridBeamAnimation } from "../Animations/GridBeamAnimation";
 import { FaFire } from "react-icons/fa";
-import { GridAnimation } from "../Animations/GridAnimation";
 
 const About = () => {
   return (
-    <section
-      style={{
-        backgroundImage:
-          "radial-gradient(100% 100% at 50% 0%, rgba(13,13,17,1), rgba(9,9,11,1))",
-      }}
-      className="relative overflow-hidden bg-zinc-950 text-zinc-200 selection:bg-zinc-600"
-    >
+    <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
       <motion.div
-        initial={{ opacity: 0, x: 1000 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, ease: "easeInOut", delay: 0.25 }}
+        initial={{
+          opacity: 0,
+        }}
+        animate={{
+          opacity: 1,
+        }}
+        transition={{
+          duration: 1.25,
+          ease: "easeInOut",
+        }}
       >
-        <Link href="/" className=" z-20 absolute left-4 top-6 text-sm">
+        <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
             Home
@@ -31,9 +30,7 @@ const About = () => {
         </Link>
       </motion.div>
       <Content />
-
-      <GridAnimation />
-    </section>
+    </div>
   );
 };
 
@@ -71,12 +68,11 @@ const Content = () => {
       <motion.div
         initial={{
           opacity: 0,
-          // x: -1000,
         }}
         whileInView={{
           opacity: 1,
-          // x: 0,
-          transition: { duration: 4, ease: "easeInOut", delay: 0.5 },
+
+          transition: { duration: 3, ease: "easeInOut", delay: 0.6 },
         }}
         viewport={{ once: true }}
         className="py-32 z-20 flex flex-col justify-center items-center"
@@ -90,12 +86,11 @@ const Content = () => {
       <motion.div
         initial={{
           opacity: 0,
-          x: -1000,
         }}
         whileInView={{
           opacity: 1,
-          x: 0,
-          transition: { duration: 1, ease: "easeInOut", delay: 0.2 },
+
+          transition: { duration: 3.5, ease: "easeInOut", delay: 0.2 },
         }}
         viewport={{ once: true }}
         className="py-32 z-20 flex flex-col justify-center items-center"
