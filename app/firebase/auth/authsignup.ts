@@ -2,8 +2,8 @@ import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { ref, set, get } from "firebase/database";
 import { getDatabase } from "firebase/database";
 import bcrypt from "bcryptjs-react";
-// import { UserInterface } from "../../../interfaces/UserInterface";
 import { app } from "../config";
+import UserInterface from "@/interfaces/UserInterface";
 
 const auth = getAuth(app);
 const db = getDatabase(app);
@@ -52,15 +52,18 @@ export default async function signUp(auth, email, password) {
       year: "numeric",
     });
     // Save the user's data to the Realtime Database
-    await set(userRef, {
-      fullName: "",
-      email: email,
-      hashedPassword: hashedPassword, // Save the hashed password instead of the original password
+    const userData: UserInterface = {
       uid: uid,
-      image: "",
-      dateCreated: currentDate,
       bio: "",
+      email: email,
+      fullName: "",
+      password: hashedPassword,
+      image: "",
       username: "",
+      dateCreated: currentDate,
+    };
+    await set(userRef, {
+      ...userData,
       // Save the current date/time as the creation date
     });
   } catch (e) {

@@ -11,6 +11,7 @@ import { GridAnimation } from "../Animations/GridAnimation";
 import { SignUpError } from "../../enums/AuthEnums";
 import { Success } from "../../enums/AuthEnums";
 import signUp from "@/app/firebase/auth/authsignup";
+import UserInterface from "@/interfaces/UserInterface";
 export const AuthSignUp = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
