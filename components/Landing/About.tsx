@@ -6,16 +6,11 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { FiArrowLeft } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
+import { CardGridAnimation } from "../Animations/CardGrid";
 
 const About = () => {
-  const { width } = useWindowSize();
-
   return (
-    <div
-      className={`bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600 ${
-        width && width <= 768 ? "md:px-8" : "px-4"
-      }`}
-    >
+    <div className={" bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600"}>
       <motion.div
         initial={{
           opacity: 0,
@@ -35,7 +30,9 @@ const About = () => {
           </BubbleButton>
         </Link>
       </motion.div>
+
       <Content />
+      <CardGridAnimation />
     </div>
   );
 };
@@ -78,7 +75,7 @@ const Content = () => {
         whileInView={{
           opacity: 1,
 
-          transition: { duration: 3, ease: "easeInOut", delay: 0.6 },
+          transition: { duration: 4, ease: "easeInOut", delay: 0.8 },
         }}
         viewport={{ once: true }}
         className="py-32 z-20 flex flex-col justify-center items-center"
@@ -112,59 +109,6 @@ const Content = () => {
       </motion.div>
     </div>
   );
-};
-
-const GradientGrid = () => {
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-      }}
-      transition={{
-        duration: 2.5,
-        ease: "easeInOut",
-      }}
-      className="absolute inset-0 z-0"
-    >
-      <div
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='rgb(30 58 138 / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`,
-        }}
-        className="absolute inset-0 z-0"
-      />
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-zinc-950/0 to-zinc-950" />
-    </motion.div>
-  );
-};
-
-const GRID_BOX_SIZE = 32;
-const BEAM_WIDTH_OFFSET = 1;
-
-type WindowSize = {
-  width: number | undefined;
-  height: number | undefined;
-};
-
-const useWindowSize = () => {
-  const [windowSize, setWindowSize] = React.useState<WindowSize>({
-    width: undefined,
-    height: undefined,
-  });
-  React.useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-  return windowSize;
 };
 
 const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {

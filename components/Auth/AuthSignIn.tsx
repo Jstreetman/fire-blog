@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode } from "react";
-import { SiGithub, SiGoogle } from "react-icons/si";
+import { SiGoogle } from "react-icons/si";
 import { FiArrowLeft } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
@@ -83,9 +83,6 @@ const SocialOptions = () => (
     <div className="mb-3 flex gap-3">
       <BubbleButton className="flex w-full justify-center py-3">
         <SiGoogle />
-      </BubbleButton>
-      <BubbleButton className="flex w-full justify-center py-3">
-        <SiGithub />
       </BubbleButton>
     </div>
   </div>
