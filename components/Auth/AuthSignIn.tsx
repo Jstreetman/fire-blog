@@ -6,9 +6,85 @@ import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 import { FaFire } from "react-icons/fa";
 import Link from "next/link";
+
+import { auth } from "@/app/firebase/config";
 import { GridAnimation } from "../Animations/GridAnimation";
+import signIn, { signInWithGoogle } from "@/app/firebase/auth/authsignin";
+import { useRouter } from "next/navigation";
 
 export const AuthSignIn = () => {
+  const router = useRouter();
+
+  const handleSignUpGoogle = async () => {
+    await signInWithGoogle();
+
+    router.push("/feed");
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const email = (e.target as any).elements.email.value;
+    const password = (e.target as any).elements.password.value;
+
+    const { result, error } = await signIn(auth, email, password);
+    if (error) {
+      return console.log(error);
+    }
+    console.log(result);
+    router.push("/feed");
+  };
+
+  const Email = () => {
+    return (
+      <form onSubmit={handleSignIn}>
+        <div className="mb-3">
+          <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
+            Email
+          </label>
+          <input
+            id="email-input"
+            type="email"
+            name="email"
+            placeholder="Email..."
+            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+          />
+        </div>
+        <div className="mb-6">
+          <div className="mb-1.5 flex items-end justify-between">
+            <label htmlFor="password-input" className="block text-zinc-400">
+              Password
+            </label>
+            <a href="#" className="text-sm text-blue-400">
+              Forgot?
+            </a>
+          </div>
+          <input
+            id="password-input"
+            type="password"
+            name="password"
+            placeholder="••••••••••••"
+            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+          />
+        </div>
+        <SplashButton type="submit" className="w-full">
+          Sign In
+        </SplashButton>
+      </form>
+    );
+  };
+  const SocialOptions = () => (
+    <div>
+      <div className="mb-3 flex gap-3">
+        <BubbleButton
+          className="flex w-full justify-center py-3"
+          onClick={handleSignUpGoogle}
+        >
+          <SiGoogle />
+        </BubbleButton>
+      </div>
+    </div>
+  );
   return (
     <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
       <motion.div
@@ -78,16 +154,6 @@ const Heading = () => (
   </div>
 );
 
-const SocialOptions = () => (
-  <div>
-    <div className="mb-3 flex gap-3">
-      <BubbleButton className="flex w-full justify-center py-3">
-        <SiGoogle />
-      </BubbleButton>
-    </div>
-  </div>
-);
-
 const Or = () => {
   return (
     <div className="my-6 flex items-center gap-3">
@@ -95,43 +161,6 @@ const Or = () => {
       <span className="text-zinc-400">OR</span>
       <div className="h-[1px] w-full bg-zinc-700" />
     </div>
-  );
-};
-
-const Email = () => {
-  return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <div className="mb-3">
-        <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
-          Email
-        </label>
-        <input
-          id="email-input"
-          type="email"
-          placeholder="Email..."
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
-      <div className="mb-6">
-        <div className="mb-1.5 flex items-end justify-between">
-          <label htmlFor="password-input" className="block text-zinc-400">
-            Password
-          </label>
-          <a href="#" className="text-sm text-blue-400">
-            Forgot?
-          </a>
-        </div>
-        <input
-          id="password-input"
-          type="password"
-          placeholder="••••••••••••"
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
-      <SplashButton type="submit" className="w-full">
-        Sign In
-      </SplashButton>
-    </form>
   );
 };
 
@@ -188,25 +217,6 @@ const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
     >
       {children}
     </button>
-  );
-};
-
-const CornerGrid = () => {
-  return (
-    <div
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='rgb(30 58 138 / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`,
-      }}
-      className="absolute right-0 top-0 z-0 size-[50vw]"
-    >
-      <div
-        style={{
-          backgroundImage:
-            "radial-gradient(100% 100% at 100% 0%, rgba(9,9,11,0), rgba(9,9,11,1))",
-        }}
-        className="absolute inset-0"
-      />
-    </div>
   );
 };
 

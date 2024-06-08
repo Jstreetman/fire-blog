@@ -1,3 +1,9 @@
-export default function Home() {
-  return <h1>Feed This Route 🤣</h1>;
+import { HomePage } from "@/components/Feed/HomePage";
+
+export default async function Home() {
+  return (
+    <div>
+      <HomePage />
+    </div>
+  );
 }

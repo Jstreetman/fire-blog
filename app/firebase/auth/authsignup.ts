@@ -35,10 +35,17 @@ export default async function signUp(auth, email, password) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create user account
-    result = await createUserWithEmailAndPassword(auth, email, password);
+    result = await createUserWithEmailAndPassword(auth, email, password).then(
+      (userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+        console.log("User created successfully:", user);
+      }
+    );
 
     // Obtain the user's UID from the result
-    const uid = result.user.uid;
+    const uid = auth.currentUser?.uid;
+    console.log("User's UID:", uid);
 
     // Save the email to the 'Emails' node in the database
     await set(emailRef, true);
