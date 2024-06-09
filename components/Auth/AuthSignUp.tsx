@@ -11,7 +11,7 @@ import { GridAnimation } from "../Animations/GridAnimation";
 import { SignUpError } from "../../enums/AuthEnums";
 import { Success } from "../../enums/AuthEnums";
 import signUp from "@/app/firebase/auth/authsignup";
-import UserInterface from "@/interfaces/UserInterface";
+import { useRouter } from "next/navigation";
 export const AuthSignUp = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -19,6 +19,8 @@ export const AuthSignUp = () => {
   const [successMessage, setShowSuccessMessage] = useState("");
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
+
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +50,7 @@ export const AuthSignUp = () => {
         }
         setShowErrorModal(true);
       } else {
-        setShowSuccessMessage(Success.SuccessMessage);
-        console.log(Success.SuccessMessage);
-        setShowSuccessModal(true);
+        router.push("/feed");
       }
     } catch (error) {
       setErrorMessage(error.message);
@@ -105,30 +105,6 @@ export const AuthSignUp = () => {
         </form>
       </motion.div>
       <GridAnimation />
-
-      {/* <CornerGrid /> */}
-
-      <AnimatePresence>
-        {showSuccessModal && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          >
-            <div className="bg-blue-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
-              <h2 className="text-xl font-semibold">{successMessage}</h2>
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="mt-4 underline"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {showErrorModal && (
@@ -257,25 +233,6 @@ const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
     >
       {children}
     </button>
-  );
-};
-
-const CornerGrid = () => {
-  return (
-    <div
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='rgb(30 58 138 / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`,
-      }}
-      className="absolute right-0 top-0 z-0 size-[50vw]"
-    >
-      <div
-        style={{
-          backgroundImage:
-            "radial-gradient(100% 100% at 100% 0%, rgba(9,9,11,0), rgba(9,9,11,1))",
-        }}
-        className="absolute inset-0"
-      />
-    </div>
   );
 };
 

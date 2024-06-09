@@ -1,8 +1,8 @@
 "use client";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { SiGoogle } from "react-icons/si";
 import { FiArrowLeft } from "react-icons/fi";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 import { FaFire } from "react-icons/fa";
 import Link from "next/link";
@@ -11,8 +11,13 @@ import { auth } from "@/app/firebase/config";
 import { GridAnimation } from "../Animations/GridAnimation";
 import signIn, { signInWithGoogle } from "@/app/firebase/auth/authsignin";
 import { useRouter } from "next/navigation";
+import { SignInError, SignUpError } from "@/enums/AuthEnums";
 
 export const AuthSignIn = () => {
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setShowSuccessMessage] = useState("");
   const router = useRouter();
 
   const handleSignUpGoogle = async () => {
@@ -27,12 +32,32 @@ export const AuthSignIn = () => {
     const email = (e.target as any).elements.email.value;
     const password = (e.target as any).elements.password.value;
 
-    const { result, error } = await signIn(auth, email, password);
-    if (error) {
-      return console.log(error);
+    if (!email || !password) {
+      setErrorMessage(SignInError.EmptyFields);
+      setShowErrorModal(true);
+      return;
     }
-    console.log(result);
-    router.push("/feed");
+    try {
+      const { result, error } = await signIn(auth, email, password);
+      if (error) {
+        if (error === SignInError.InvalidEmail) {
+          setErrorMessage(SignInError.InvalidEmail);
+          console.log(SignInError.InvalidEmail);
+        } else if (error === SignInError.InvalidCredentials) {
+          setErrorMessage(SignInError.InvalidCredentials);
+          console.log(SignInError.InvalidCredentials);
+        } else {
+          setErrorMessage(SignInError.IncorrectPassword);
+          console.log(SignInError.IncorrectPassword);
+        }
+        setShowErrorModal(true);
+      }
+      console.log("User signed in successfully");
+      router.refresh();
+    } catch (error) {
+      setErrorMessage(error.message.toString());
+      setShowErrorModal(true);
+    }
   };
 
   const Email = () => {
@@ -129,10 +154,29 @@ export const AuthSignIn = () => {
         <Email />
         <Terms />
       </motion.div>
-
+      <AnimatePresence>
+        {showErrorModal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+          >
+            <div className="bg-red-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
+              <h2 className="text-xl font-semibold">Error</h2>
+              <p className="mt-2">{errorMessage}</p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="mt-4 underline"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <GridAnimation />
-
-      {/* <CornerGrid /> */}
     </div>
   );
 };

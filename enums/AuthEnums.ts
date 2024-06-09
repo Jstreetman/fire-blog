@@ -7,8 +7,14 @@ enum SignUpError {
 
 enum Success {
   SuccessMessage = "You have successfully signed up!",
+  SuccessMessageLogin = "You have successfully logged in!",
 }
 
-enum SignInError {}
+enum SignInError {
+  InvalidCredentials = "Invalid credentials",
+  EmptyFields = "Please fill in all fields",
+  IncorrectPassword = "Incorrect password",
+  InvalidEmail = "Email address not found",
+}
 
-export { SignUpError, Success };
+export { SignUpError, Success, SignInError };
