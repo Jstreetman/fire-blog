@@ -44,43 +44,52 @@ export default async function signIn(auth, email, password) {
 
 export async function signInWithGoogle() {
   const auth = getAuth();
-  // This gives you a Google Access Token. You can use it to access the Google API.
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const creationTime = new Date(result.user.metadata.creationTime);
-    const formattedDate = `${creationTime.toLocaleString("default", {
-      month: "short",
-    })} ${creationTime.getDate()}, ${creationTime.getFullYear()}`;
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // IdP data available using getAdditionalUserInfo(result)
+      const creationTime = new Date(result.user.metadata.creationTime);
+      const formattedDate = `${creationTime.toLocaleString("default", {
+        month: "short",
+      })} ${creationTime.getDate()}, ${creationTime.getFullYear()}`;
 
-    const db = getDatabase();
-    const user = result.user;
+      const db = getDatabase();
 
-    const userdata: UserInterface = {
-      uid: user.uid,
-      bio: "",
-      email: user.email,
-      fullName: "",
-      password: "Not Available",
-      image: user.photoURL,
-      username: "",
-      dateCreated: formattedDate,
-    };
-    set(ref(db, `Users/${user.uid}`), {
-      ...userdata,
+      const userdata: UserInterface = {
+        uid: user.uid,
+        bio: "",
+        email: user.email,
+        fullName: "",
+        password: "Not Available",
+        image: "",
+        username: "",
+        dateCreated: formattedDate,
+      };
+      set(ref(db, `Users/${user.uid}`), {
+        ...userdata,
+      });
+
+      console.log("User signed in successfully:", user.email);
+      const uid = auth.currentUser.uid;
+
+      if (uid) {
+        createSession(uid + createRandomString(5));
+        console.log("Session created successfully");
+      }
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
     });
-
-    console.log("User signed in successfully:", user.email);
-    const uid = auth.currentUser.uid;
-
-    if (uid) {
-      createSession(uid);
-      console.log("Session created successfully");
-    }
-    return { result, error: null };
-  } catch (error) {
-    return { result: null, error };
-  }
 }
 
 export async function signOutWithGoogle() {
