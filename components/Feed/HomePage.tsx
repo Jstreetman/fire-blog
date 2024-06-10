@@ -43,7 +43,7 @@ export const HomePage = () => {
 
   const handleSignOut = async () => {
     await signOutWithGoogle();
-    router.push("/");
+    router.push("/signin");
   };
 
   return (
