@@ -5,6 +5,9 @@ import {
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged as _onAuthStateChanged,
+  signInWithRedirect,
+  UserCredential,
+  getRedirectResult,
 } from "firebase/auth";
 import bcrypt from "bcryptjs-react";
 
@@ -87,53 +90,44 @@ export default async function signIn(auth, email, password) {
 }
 
 export async function signInWithGoogle() {
-  const auth = getAuth();
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      // IdP data available using getAdditionalUserInfo(result)
-      const creationTime = new Date(result.user.metadata.creationTime);
-      const formattedDate = `${creationTime.toLocaleString("default", {
-        month: "short",
-      })} ${creationTime.getDate()}, ${creationTime.getFullYear()}`;
+  //add google signin with popup
+  signInWithPopup(auth, provider).then((result) => {
+    const user = result.user;
+    const creationTime = new Date(result.user.metadata.creationTime);
+    const formattedDate = `${creationTime.toLocaleString("default", {
+      month: "short",
+    })} ${creationTime.getDate()}, ${creationTime.getFullYear()}`;
 
-      const db = getDatabase();
-
-      const userdata: UserInterface = {
-        uid: user.uid,
-        bio: "",
-        email: user.email,
-        fullName: "",
-        password: "Not Available",
-        image: "",
-        username: "",
-        dateCreated: formattedDate,
-      };
-      set(ref(db, `Users/${user.uid}`), {
-        ...userdata,
-      });
-
-      console.log("User signed in successfully:", user.email);
-      const uid = auth.currentUser.uid;
-
-      if (uid) {
-        createSession(uid + createRandomString(5));
-        console.log("Session created successfully");
+    const db = getDatabase();
+    const userData: UserInterface = {
+      uid: user.uid,
+      bio: "",
+      email: user.email,
+      fullName: "",
+      password: "Not Available",
+      image: user.photoURL,
+      username: "",
+      dateCreated: formattedDate,
+    };
+    const userRef = ref(db, `Users/${user.uid}`);
+    get(userRef).then((snapshot) => {
+      if (!snapshot.exists()) {
+        set(ref(db, `Users/${user.uid}`), {
+          ...userData,
+        });
       }
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
     });
+
+    console.log("User signed in successfully:", user.email);
+    const uid = auth.currentUser.uid;
+
+    if (uid) {
+      createSession(uid + createRandomString(5));
+      console.log("Session created successfully");
+    }
+
+    console.log("User signed in successfully:", user);
+  });
 }
 
 export async function signOutWithGoogle() {

@@ -20,12 +20,6 @@ export const AuthSignIn = () => {
   const [successMessage, setShowSuccessMessage] = useState("");
   const router = useRouter();
 
-  const handleSignUpGoogle = async () => {
-    await signInWithGoogle();
-
-    router.refresh();
-  };
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -58,6 +52,12 @@ export const AuthSignIn = () => {
       setErrorMessage(error.message.toString());
       setShowErrorModal(true);
     }
+  };
+
+  const handleSignUpGoogle = async () => {
+    await signInWithGoogle();
+
+    router.push("/feed");
   };
 
   const Email = () => {
