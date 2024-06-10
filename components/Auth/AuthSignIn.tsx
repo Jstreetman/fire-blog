@@ -23,7 +23,7 @@ export const AuthSignIn = () => {
   const handleSignUpGoogle = async () => {
     await signInWithGoogle();
 
-    router.push("/feed");
+    router.refresh();
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
