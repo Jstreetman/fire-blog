@@ -1,15 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { signOutWithGoogle } from "../../app/firebase/auth/authsignin";
 import { useRouter } from "next/navigation";
 import { getAuth } from "firebase/auth";
 import { app } from "../../app/firebase/config";
 import { getDatabase, ref, get } from "firebase/database";
+import FeedNavbar from "./FeedNavbar/FeedNavbar";
 
 export const HomePage = () => {
   const router = useRouter();
   const auth = getAuth(app);
   const [userData, setUserData] = useState(null);
+
+  //TODO: Add Components for Feed Page Here...
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,14 +43,10 @@ export const HomePage = () => {
     fetchData();
   }, [auth.currentUser, router]);
 
-  const handleSignOut = async () => {
-    await signOutWithGoogle();
-    router.push("/signin");
-  };
-
   return (
     <div>
-      {userData ? (
+      <FeedNavbar />
+      {/* {userData ? (
         <div className="flex flex-col items-center justify-center py-16 ">
           <h1>User Data:</h1>
           <p>Bio: {userData.bio}</p>
@@ -69,7 +67,7 @@ export const HomePage = () => {
             Sign out
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
