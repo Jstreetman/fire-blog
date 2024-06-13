@@ -5,6 +5,7 @@ import { getAuth } from "firebase/auth";
 import { app } from "../../app/firebase/config";
 import { getDatabase, ref, get } from "firebase/database";
 import FeedNavbar from "./FeedNavbar/FeedNavbar";
+import { FeedPostCard } from "./FeedPostCard/FeedPostCard";
 
 export const HomePage = () => {
   const router = useRouter();
@@ -46,6 +47,9 @@ export const HomePage = () => {
   return (
     <div>
       <FeedNavbar />
+      <div className="py-16">
+        <FeedPostCard />
+      </div>
       {/* {userData ? (
         <div className="flex flex-col items-center justify-center py-16 ">
           <h1>User Data:</h1>
