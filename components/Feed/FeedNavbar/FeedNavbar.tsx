@@ -6,6 +6,9 @@ import { FaFire } from "react-icons/fa";
 import Link from "next/link";
 import { signOutWithGoogle } from "@/app/firebase/auth/authsignin";
 import { useRouter } from "next/navigation";
+import { app } from "@/app/firebase/config";
+import { getAuth } from "firebase/auth";
+import { usePathname } from "next/navigation";
 
 const FeedNavbar = () => {
   return (
@@ -35,7 +38,9 @@ const Logo = () => {
   // Temp logo from https://logoipsum.com/
   return (
     <div>
-      <FaFire className="h-7 w-7 text-blue-400" />
+      <Link href="/feed">
+        <FaFire className="h-7 w-7 text-blue-400" />
+      </Link>
     </div>
   );
 };
@@ -77,6 +82,12 @@ const NavLink = ({ text }: { text: string }) => {
 
 const NavRight = () => {
   const router = useRouter();
+  const auth = getAuth(app);
+  const user = auth.currentUser;
+  const uid = user?.uid;
+  const pathname = usePathname();
+
+  const isProfileRoute = pathname === `/profile/${uid}`;
 
   const handleSignOut = async () => {
     await signOutWithGoogle();
@@ -86,12 +97,14 @@ const NavRight = () => {
     <div className="flex items-center gap-4">
       <NavLink text="Notifications" />
 
-      <Link
-        href="#"
-        className="px-4 py-2 scale-100 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent font-medium rounded-md whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
-      >
-        Profile
-      </Link>
+      {!isProfileRoute && (
+        <Link
+          href={`/profile/${uid}`}
+          className="px-4 py-2 scale-100 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent font-medium rounded-md whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
+        >
+          Profile
+        </Link>
+      )}
 
       <button
         onClick={handleSignOut}

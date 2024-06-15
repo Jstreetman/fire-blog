@@ -89,6 +89,32 @@ export default async function signIn(auth, email, password) {
   }
 }
 
+export async function getUID(uid) {
+  //get uid of any user from database
+  const db = getDatabase();
+  const userRef = ref(db, `Users/${uid}/uid`);
+  const userSnapshot = await get(userRef);
+  if (!userSnapshot.exists()) {
+    return null;
+  }
+  const userData = userSnapshot.val();
+  const user = userData?.uid;
+  return user;
+}
+
+export async function getanyUser(uid) {
+  const db = getDatabase();
+  const userRef = ref(db, `Users/${uid}`);
+  const userSnapshot = await get(userRef);
+  console.log(userRef);
+  if (!userSnapshot.exists()) {
+    return null;
+  }
+  const userData = userSnapshot.val();
+  const user = userData?.uid;
+  return user;
+}
+
 export async function signInWithGoogle() {
   //add google signin with popup
   signInWithPopup(auth, provider).then((result) => {

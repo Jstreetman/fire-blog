@@ -3,5 +3,5 @@ export const ROOT_ROUTE_SIGNUP = "/signup";
 export const ROOT_ROUTE = "/";
 export const HOME_ROUTE = "/feed";
 export const ONBOARDING_ROUTE = "/onboarding";
-
+export const PROFILE_ROUTE = "/profile/:path*";
 export const SESSION_COOKIE_NAME = "AuthToken";
