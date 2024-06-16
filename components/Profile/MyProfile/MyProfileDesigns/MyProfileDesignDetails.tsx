@@ -127,6 +127,7 @@ const ProfileDesignCard = () => {
                 type="text"
                 id="fullName"
                 value={newFullName}
+                required
                 onChange={(e) => setNewFullName(e.target.value)}
                 className="border border-gray-300 rounded-md p-2 w-full text-black"
               />
@@ -139,6 +140,7 @@ const ProfileDesignCard = () => {
                 type="text"
                 id="username"
                 value={newUsername}
+                required
                 onChange={(e) => setNewUsername(e.target.value)}
                 className="border border-gray-300 rounded-md p-2 w-full text-black"
               />
@@ -151,6 +153,7 @@ const ProfileDesignCard = () => {
                 type="text"
                 id="bio"
                 value={newBio}
+                required
                 onChange={(e) => setNewBio(e.target.value)}
                 className="border border-gray-300 rounded-md p-2 w-full text-black"
               />
