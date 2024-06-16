@@ -14,24 +14,38 @@ export default function Page({ params }: { params: { slug: string } }) {
   //and render them based off if the slug param uid is the same as
   //the current user uid or not
 
+  /**
+   * Fetches the username for a given user ID from the database.
+   *
+   * @param {string} uid - The user ID.
+   * @return {Promise<string>} The username for the user.
+   * @throws {Error} If the username is not found for the given user ID.
+   */
   async function fetchUserDetails(uid: string) {
-    //get any user profile by uid from database
+    // Get the database reference
     const database = getDatabase(app);
+
+    // Define the path to the user profile in the database
     const usersRef = ref(database, "Users");
     const userRef = child(usersRef, uid);
     const usernameRef = child(userRef, "email");
 
     try {
+      // Fetch the username from the database
       const snapshot = await get(usernameRef);
+
+      // If the snapshot exists, return the username
       if (snapshot.exists()) {
         const username = snapshot.val();
-        console.log("Username for UID " + uid + ":", username);
+        console.log(`Username for UID ${uid}:`, username);
         return username;
       } else {
-        throw new Error("Username not found for UID: " + uid);
+        // If the snapshot does not exist, throw an error
+        throw new Error(`Username not found for UID: ${uid}`);
       }
     } catch (error) {
-      console.error("Error fetching username for UID: " + uid, error);
+      // If there is an error fetching the username, log the error and re-throw it
+      console.error(`Error fetching username for UID ${uid}:`, error);
       throw error;
     }
   }
