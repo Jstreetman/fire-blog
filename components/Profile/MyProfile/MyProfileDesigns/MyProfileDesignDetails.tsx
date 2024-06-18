@@ -2,12 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import profileIcon from "../../../../public/icons/profile.png";
-import { MdAccountCircle, MdCreate } from "react-icons/md";
-import { app } from "@/app/firebase/config";
+import coverPicDefault from "../../../../public/coverpicdefault.jpeg";
+import { MdAccountCircle, MdCreate, MdCameraAlt } from "react-icons/md";
+import { app, storage } from "@/app/firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  getProfilePhotos,
+  getCoverPhotos,
+} from "@/app/firebase/get/getprofile";
+
 import { getAuth } from "firebase/auth";
 import { getProfile } from "@/app/firebase/get/getprofile";
 import updateUser from "@/app/firebase/put/updateprofile";
+import { updateCoverPic } from "@/app/firebase/put/updateprofilephotos";
+import { updateProfilePic } from "@/app/firebase/put/updateprofilephotos";
 import deleteProfile from "@/app/firebase/delete/profile/deleteprofile";
 import { useRouter } from "next/navigation";
 
@@ -30,16 +38,23 @@ const ProfileDesignCard = () => {
   const userId = auth.currentUser?.uid;
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const [profilePhotos, setProfilePhotos] = useState(userDetails?.url || null);
+  const [coverPhotos, setCoverPhotos] = useState(userDetails?.data || null);
   const [newFullName, setNewFullName] = useState(userDetails?.fullName || "");
   const [newUsername, setNewUsername] = useState(userDetails?.username || "");
   const [newBio, setNewBio] = useState(userDetails?.bio || "");
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   // Fetch user details and update state
+
   useEffect(() => {
-    router.refresh();
     const fetchData = async () => {
-      const data = await getProfile(userId); // Assuming userId is defined
+      const data = await getProfile(userId);
+      // console.log(data, "data");
       setUserDetails(data);
     };
 
@@ -51,6 +66,49 @@ const ProfileDesignCard = () => {
     return <div>No data...</div>;
   }
 
+  const refreshPage = () => {
+    router.refresh();
+  };
+
+  const handleOpenProfilePicModal = async () => {
+    setIsProfilePicModalOpen(true);
+
+    // Handle file input
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+
+      if (file) {
+        await updateProfilePic(userId, file);
+        refreshPage();
+      }
+    };
+    input.click();
+  };
+
+  const handleOpenModal = async () => {
+    setIsOpenModal(true);
+
+    // Handle file input
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+
+      // Upload file to Firebase Storage
+
+      if (file) {
+        await updateCoverPic(userId, file);
+        refreshPage();
+      }
+    };
+    input.click();
+  };
   // Function to handle modal open/close
   const handleModalOpen = () => {
     setIsModalOpen(true);
@@ -190,9 +248,46 @@ const ProfileDesignCard = () => {
   return (
     <div className="mx-auto bg-gradient-to-br from-white/20 to-white/5 backdrop-blur rounded-lg lg:w-3/5 md:w-3/4 sm:w-4/5">
       <div className="w-full">
-        <div className="flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg h-64">
-          <MdAccountCircle className="w-32 h-32" />
-          <h1 className="text-3xl font-bold">{userDetails.fullName}</h1>{" "}
+        <div
+          className="flex flex-col  p-3  bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg h-64 object-contain"
+          style={{
+            backgroundImage: `url(${
+              userDetails?.cover && userDetails.cover.startsWith("http")
+                ? userDetails.cover
+                : coverPicDefault
+            })`,
+          }}
+        >
+          <div className="flex ">
+            <MdCameraAlt
+              onClick={handleOpenModal}
+              className=" w-8 h-8 rounded-full hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all bg-blue-300 hover:bg-blue-300"
+            />
+          </div>
+          <div className="relative flex justify-center items-center">
+            <div className="flex items-end">
+              {userDetails.image ? (
+                <Image
+                  onClick={handleOpenProfilePicModal}
+                  src={userDetails.image}
+                  alt="Profile Picture"
+                  className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                  width={128}
+                  height={128}
+                />
+              ) : (
+                <MdAccountCircle
+                  onClick={handleOpenProfilePicModal}
+                  className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                  width={128}
+                  height={128}
+                />
+              )}
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-center">
+            {userDetails.fullName}
+          </h1>{" "}
         </div>
         <div className="p-5 flex flex-col">
           <div className="flex justify-end">
@@ -201,9 +296,11 @@ const ProfileDesignCard = () => {
               onClick={handleModalOpen}
             />
           </div>
-          <h1>{userDetails.username}</h1>
-          <p>{userDetails.bio}</p>
-          <h6>Date Joined: {userDetails.dateCreated}</h6>
+          <h1 className="text-2xl font-bold">{userDetails.username}</h1>
+          <p className="text-sm inline-block">{userDetails.bio}</p>
+          <h6 className="text-xs inline-block">
+            Joined: {userDetails.dateCreated}
+          </h6>
           <h6>Followers: 0 {userDetails.followers}</h6>
           <h6>Following: 0 {userDetails.following}</h6>
         </div>

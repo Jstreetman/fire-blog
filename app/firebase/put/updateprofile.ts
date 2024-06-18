@@ -3,9 +3,10 @@ import { getAuth } from "firebase/auth";
 import { getDatabase, update, ref } from "firebase/database";
 
 const auth = getAuth(app);
-let db = getDatabase(app);
 
 export default async function updateUser(uid, username, fullName, bio) {
+  let db = getDatabase(app);
+
   const userId = auth.currentUser?.uid;
   uid = userId;
 
