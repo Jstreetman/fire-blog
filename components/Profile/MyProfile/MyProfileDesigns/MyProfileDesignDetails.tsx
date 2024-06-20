@@ -18,7 +18,7 @@ import { updateCoverPic } from "@/app/firebase/put/updateprofilephotos";
 import { updateProfilePic } from "@/app/firebase/put/updateprofilephotos";
 import deleteProfile from "@/app/firebase/delete/profile/deleteprofile";
 import { useRouter } from "next/navigation";
-
+import LoadingAnimation from "@/components/Animations/LoadingAnimation";
 export const MyProfileDesignDetails = () => {
   return (
     <motion.div
@@ -42,13 +42,13 @@ const ProfileDesignCard = () => {
   const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const [profilePhotos, setProfilePhotos] = useState(userDetails?.url || null);
-  const [coverPhotos, setCoverPhotos] = useState(userDetails?.data || null);
+  const [isLoading, setIsLoading] = useState(false);
   const [newFullName, setNewFullName] = useState(userDetails?.fullName || "");
   const [newUsername, setNewUsername] = useState(userDetails?.username || "");
   const [newBio, setNewBio] = useState(userDetails?.bio || "");
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   // Fetch user details and update state
 
   useEffect(() => {
@@ -63,17 +63,17 @@ const ProfileDesignCard = () => {
 
   // Render loading state if userDetails is null
   if (!userDetails) {
-    return <div>No data...</div>;
+    return (
+      <div>
+        <LoadingAnimation />
+      </div>
+    );
   }
 
-  const refreshPage = () => {
-    router.refresh();
-  };
-
   const handleOpenProfilePicModal = async () => {
+    setIsLoading(true);
     setIsProfilePicModalOpen(true);
 
-    // Handle file input
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -82,17 +82,21 @@ const ProfileDesignCard = () => {
       setSelectedFile(file);
 
       if (file) {
+        setIsRefreshing(true);
         await updateProfilePic(userId, file);
-        refreshPage();
+        const data = await getProfile(userId);
+        setUserDetails(data);
+        setIsRefreshing(false);
+        router.refresh();
       }
     };
     input.click();
   };
 
   const handleOpenModal = async () => {
+    setIsLoading(true);
     setIsOpenModal(true);
 
-    // Handle file input
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -100,15 +104,41 @@ const ProfileDesignCard = () => {
       const file = e.target.files[0];
       setSelectedFile(file);
 
-      // Upload file to Firebase Storage
-
       if (file) {
+        setIsRefreshing(true);
         await updateCoverPic(userId, file);
-        refreshPage();
+
+        const data = await getProfile(userId);
+        setUserDetails(data);
+        setIsRefreshing(false);
       }
     };
     input.click();
   };
+
+  // const handleOpenModal = async () => {
+  //   setIsLoading(true);
+
+  //   setIsOpenModal(true);
+
+  //   // Handle file input
+  //   const input = document.createElement("input");
+  //   input.type = "file";
+  //   input.accept = "image/*";
+  //   input.onchange = async (e: any) => {
+  //     const file = e.target.files[0];
+  //     setSelectedFile(file);
+
+  //     // Upload file to Firebase Storage
+
+  //     if (file) {
+  //       const data = updateCoverPic(userId, file);
+  //       setUserDetails(data);
+  //       //router.refresh();
+  //     }
+  //   };
+  //   input.click();
+  // };
   // Function to handle modal open/close
   const handleModalOpen = () => {
     setIsModalOpen(true);
@@ -247,65 +277,75 @@ const ProfileDesignCard = () => {
   // Once userDetails is available, render the user details
   return (
     <div className="mx-auto bg-gradient-to-br from-white/20 to-white/5 backdrop-blur rounded-lg lg:w-3/5 md:w-3/4 sm:w-4/5">
-      <div className="w-full">
-        <div
-          className="flex flex-col  p-3  bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg h-64 object-contain"
-          style={{
-            backgroundImage: `url(${
-              userDetails?.cover && userDetails.cover.startsWith("http")
-                ? userDetails.cover
-                : coverPicDefault
-            })`,
-          }}
-        >
-          <div className="flex ">
-            <MdCameraAlt
-              onClick={handleOpenModal}
-              className=" w-8 h-8 rounded-full hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all bg-blue-300 hover:bg-blue-300"
-            />
-          </div>
-          <div className="relative flex justify-center items-center">
-            <div className="flex items-end">
-              {userDetails.image ? (
-                <Image
-                  onClick={handleOpenProfilePicModal}
-                  src={userDetails.image}
-                  alt="Profile Picture"
-                  className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                  width={128}
-                  height={128}
+      {isRefreshing ? (
+        <LoadingAnimation />
+      ) : (
+        <div>
+          {" "}
+          <div className="w-full">
+            <div
+              className="flex flex-col  p-3  bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg h-64 "
+              style={{
+                backgroundImage: `url(${
+                  userDetails?.cover && userDetails.cover.startsWith("http")
+                    ? userDetails.cover
+                    : coverPicDefault
+                })`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              <div className="flex ">
+                <MdCameraAlt
+                  onClick={handleOpenModal}
+                  className=" w-8 h-8 rounded-full border-[1px] border-white/30 hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all  "
                 />
-              ) : (
-                <MdAccountCircle
-                  onClick={handleOpenProfilePicModal}
-                  className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                  width={128}
-                  height={128}
+              </div>
+              <div className="relative flex justify-center items-center">
+                <div className="flex items-end">
+                  {userDetails.image ? (
+                    <Image
+                      onClick={handleOpenProfilePicModal}
+                      src={userDetails.image}
+                      alt="Profile Picture"
+                      className="object-cover h-32 w-132 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                      width={128}
+                      height={128}
+                    />
+                  ) : (
+                    <MdAccountCircle
+                      onClick={handleOpenProfilePicModal}
+                      className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                      width={128}
+                      height={128}
+                    />
+                  )}
+                </div>
+              </div>
+              <h1 className="text-3xl font-bold text-center">
+                {userDetails.fullName}
+              </h1>{" "}
+            </div>
+            <div className="p-5 flex flex-col">
+              <div className="flex justify-end">
+                <MdCreate
+                  className="w-8 h-8 rounded-full hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                  onClick={handleModalOpen}
                 />
-              )}
+              </div>
+              <h1 className="text-2xl font-bold">{userDetails.username}</h1>
+              <p className="text-sm inline-block">{userDetails.bio}</p>
+              <h6 className="text-xs inline-block">
+                Joined: {userDetails.dateCreated}
+              </h6>
+              <h6>Followers: 0 {userDetails.followers}</h6>
+              <h6>Following: 0 {userDetails.following}</h6>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-center">
-            {userDetails.fullName}
-          </h1>{" "}
+          <AnimatePresence>{isModalOpen && modalContent}</AnimatePresence>
         </div>
-        <div className="p-5 flex flex-col">
-          <div className="flex justify-end">
-            <MdCreate
-              className="w-8 h-8 rounded-full hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-              onClick={handleModalOpen}
-            />
-          </div>
-          <h1 className="text-2xl font-bold">{userDetails.username}</h1>
-          <p className="text-sm inline-block">{userDetails.bio}</p>
-          <h6 className="text-xs inline-block">
-            Joined: {userDetails.dateCreated}
-          </h6>
-          <h6>Followers: 0 {userDetails.followers}</h6>
-          <h6>Following: 0 {userDetails.following}</h6>
-        </div>
-      </div>
-      <AnimatePresence>{isModalOpen && modalContent}</AnimatePresence>
+      )}
     </div>
   );
 };
