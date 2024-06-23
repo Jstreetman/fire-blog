@@ -6,6 +6,8 @@ import { app } from "../../app/firebase/config";
 import { getDatabase, ref, get } from "firebase/database";
 import FeedNavbar from "./FeedNavbar/FeedNavbar";
 import { FeedPostCard } from "./FeedPostCard/FeedPostCard";
+import { FeedPost } from "./Post/FeedPost";
+import { PostDetails } from "./Post/FeedPostDetails";
 
 export const HomePage = () => {
   const router = useRouter();
@@ -47,31 +49,10 @@ export const HomePage = () => {
   return (
     <div>
       <FeedNavbar />
-      <div className="py-16">
+      <div className="py-16 ">
         <FeedPostCard />
       </div>
-      {/* {userData ? (
-        <div className="flex flex-col items-center justify-center py-16 ">
-          <h1>User Data:</h1>
-          <p>Bio: {userData.bio}</p>
-          <p>Full Name: {userData.fullName}</p>
-          <p>Username: {userData.username}</p>
-          <p>email: {userData.email}</p>
-          <button onClick={handleSignOut} className="bg-blue-500 px-4 py-2">
-            Sign out
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center py-16 ">
-          <h1>
-            The food for this feed is currently being prepared. Please come back
-            later 🤣
-          </h1>
-          <button onClick={handleSignOut} className="bg-blue-500 px-4 py-2">
-            Sign out
-          </button>
-        </div>
-      )} */}
+      <FeedPost />
     </div>
   );
 };

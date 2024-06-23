@@ -131,7 +131,7 @@ export async function signInWithGoogle() {
       email: user.email,
       fullName: "",
       password: "Not Available",
-      image: user.photoURL,
+      image: "",
       username: "",
       dateCreated: formattedDate,
     };

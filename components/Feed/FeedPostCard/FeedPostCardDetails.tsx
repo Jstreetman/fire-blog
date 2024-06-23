@@ -9,6 +9,7 @@ import { app } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { MdAccountCircle } from "react-icons/md";
 import LoadingAnimation from "@/components/Animations/LoadingAnimation";
+import PostModal from "./FeedModal/FeedModalDetails";
 
 export const FeedPostCardDetails = () => {
   return (
@@ -23,17 +24,24 @@ const FeedCard = () => {
   const router = useRouter();
   const auth = getAuth(app);
   const userId = auth.currentUser?.uid;
+
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   //call useEffect to fetch user details
   useEffect(() => {
     const fetchData = async () => {
       const data = await getProfile(userId);
       setUserDetails(data);
+
       router.refresh();
     };
     fetchData();
   }, [userId, isRefreshing, router]);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   return (
     <div>
@@ -60,12 +68,16 @@ const FeedCard = () => {
             )}
           </div>
           <div className="flex flex-row justify-center mx-auto w-4/5">
-            <button className="w-full border-[1px] border-white/20 scale-100 hover:scale-105 hover:bg-white/30 active:scale-95 transition-all rounded-3xl">
+            <button
+              onClick={toggleModal}
+              className="w-full border-[1px] border-white/20 scale-100 hover:scale-105 hover:bg-white/30 active:scale-95 transition-all rounded-3xl"
+            >
               Create a post
             </button>
           </div>
         </motion.div>
       )}
+      {isModalOpen && <PostModal onClose={toggleModal} />}
     </div>
   );
 };

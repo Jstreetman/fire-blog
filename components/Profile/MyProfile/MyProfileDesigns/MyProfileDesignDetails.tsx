@@ -4,12 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import coverPicDefault from "../../../../public/coverpicdefault.jpeg";
 import { MdAccountCircle, MdCreate, MdCameraAlt } from "react-icons/md";
-import { app, storage } from "@/app/firebase/config";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import {
-  getProfilePhotos,
-  getCoverPhotos,
-} from "@/app/firebase/get/getprofile";
+import { app } from "@/app/firebase/config";
 
 import { getAuth } from "firebase/auth";
 import { getProfile } from "@/app/firebase/get/getprofile";
@@ -18,6 +13,7 @@ import { updateCoverPic } from "@/app/firebase/put/updateprofilephotos";
 import { updateProfilePic } from "@/app/firebase/put/updateprofilephotos";
 import deleteProfile from "@/app/firebase/delete/profile/deleteprofile";
 import { useRouter } from "next/navigation";
+import { CardGridAnimation } from "@/components/Animations/CardGrid";
 import LoadingAnimation from "@/components/Animations/LoadingAnimation";
 export const MyProfileDesignDetails = () => {
   return (
@@ -54,7 +50,6 @@ const ProfileDesignCard = () => {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getProfile(userId);
-      // console.log(data, "data");
       setUserDetails(data);
     };
 

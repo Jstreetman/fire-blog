@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { app } from "@/app/firebase/config";
-import { getAuth } from "firebase/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
