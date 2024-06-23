@@ -16,6 +16,7 @@ const FeedNavbar = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
+      className="fixed top-0 left-0 right-0 z-50"
     >
       <FlipNav />
       <div className="h-30" />

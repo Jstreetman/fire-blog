@@ -3,7 +3,7 @@ import { MyProfileDetails } from "./MyProfile/MyProfileDetails";
 
 export const MyProfilePage = () => {
   return (
-    <div>
+    <div className="py-16">
       <FeedNavbar />
       <MyProfileDetails />
     </div>

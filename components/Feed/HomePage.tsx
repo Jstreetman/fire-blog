@@ -49,7 +49,7 @@ export const HomePage = () => {
   return (
     <div>
       <FeedNavbar />
-      <div className="py-16 ">
+      <div className="py-20 ">
         <FeedPostCard />
       </div>
       <FeedPost />
