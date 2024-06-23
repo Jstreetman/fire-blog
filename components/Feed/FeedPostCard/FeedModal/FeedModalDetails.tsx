@@ -43,7 +43,7 @@ const PostModal = ({ onClose }) => {
     setTitle(value.slice(0, 50));
   };
   return (
-    <div className="  py-64  grid place-content-center">
+    <div className="  grid place-content-center">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
