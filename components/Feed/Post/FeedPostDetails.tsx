@@ -5,8 +5,11 @@ import { MdAccountCircle, MdComment } from "react-icons/md";
 import { FaHeart } from "react-icons/fa";
 import { app } from "@/app/firebase/config";
 import { getAuth } from "firebase/auth";
-import { getPosts } from "@/app/firebase/get/getposts";
+import { getBlogPosts, getPosts } from "@/app/firebase/get/getposts";
+import { getOtherUserPosts } from "@/app/firebase/get/getposts";
 import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 
 export const FeedPostDetails = () => {
   const auth = getAuth(app);
@@ -18,7 +21,7 @@ export const FeedPostDetails = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getPosts(userId);
+      const data = await getOtherUserPosts(userId);
       setUserDetails(data);
     };
 
@@ -29,9 +32,10 @@ export const FeedPostDetails = () => {
       {userDetails?.posts.map((post) => (
         <PostDetails
           key={post.key}
-          title={post.title}
+          title={post?.title}
           username={post.username}
           bio={post.bio}
+          uid={post.uid}
           image={post.image}
           postData={post.postData}
           likes={post.likes}
@@ -42,7 +46,18 @@ export const FeedPostDetails = () => {
   );
 };
 
-export const PostDetails = (props: any) => {
+export const PostDetails = (props: any, { params }) => {
+  const auth = getAuth(app);
+  const userId = auth.currentUser?.uid;
+  const router = useRouter();
+  params = props.uid;
+  // console.log(params);
+
+  const pathName = usePathname();
+
+  const profileROute = `/profile/${params}`;
+  const MyProfileRoute = `/myprofile/${userId}`;
+
   //
   return (
     <motion.div
@@ -55,21 +70,27 @@ export const PostDetails = (props: any) => {
         <div className="flex flex-col items-start " key={props.key}>
           <div className="flex flex-row p-3 gap-4 items-center ">
             {props.image ? (
-              <Image
-                src={props.image}
-                alt="Profile Picture"
-                className="object-cover h-12 w-12 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                width={128}
-                height={128}
-              />
+              <Link href={userId === props.uid ? MyProfileRoute : profileROute}>
+                <Image
+                  src={props.image}
+                  alt="Profile Picture"
+                  className="object-cover h-12 w-12 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+                  width={128}
+                  height={128}
+                />
+              </Link>
             ) : (
               <MdAccountCircle className="h-12 w-12" />
             )}
             <div className="flex flex-col">
               <h1 className="content-start font-bold text-lg">
-                {props.username}
+                {props.username.charAt(0).toUpperCase() +
+                  props.username.slice(1)}
               </h1>
               <h3 className="content-start font-thin text-xs">{props.bio}</h3>
+              <h3 className="content-start font-thin text-xs hidden ">
+                {props.uid}
+              </h3>
             </div>
           </div>
           <div className="flex flex-col p-3">

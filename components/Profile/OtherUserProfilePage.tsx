@@ -1,3 +1,9 @@
-export const UserProfilePage = () => {
-  return <div>User Profile Page</div>;
+import { OtherProfileDetails } from "./OtherProfile/OtherProfileDetails";
+
+export const OtherUserProfilePage = () => {
+  return (
+    <div>
+      <OtherProfileDetails />
+    </div>
+  );
 };

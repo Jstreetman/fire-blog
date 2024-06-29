@@ -5,7 +5,7 @@ import { FiMenu, FiArrowRight } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import Link from "next/link";
 import { signOutWithGoogle } from "@/app/firebase/auth/authsignin";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { app } from "@/app/firebase/config";
 import { getAuth } from "firebase/auth";
 import { usePathname } from "next/navigation";
@@ -29,7 +29,7 @@ const FlipNav = () => {
   return (
     <nav className=" glass-nav p-4  border-white/10 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur flex items-center justify-between relative">
       <NavLeft setIsOpen={setIsOpen} />
-      <NavRight />
+      <NavRight params={useParams} />
       <NavMenu isOpen={isOpen} />
     </nav>
   );
@@ -81,14 +81,14 @@ const NavLink = ({ text }: { text: string }) => {
   );
 };
 
-const NavRight = () => {
+const NavRight = ({ params }) => {
   const router = useRouter();
   const auth = getAuth(app);
-  const user = auth.currentUser;
-  const uid = user?.uid;
+  const uid = auth.currentUser?.uid;
   const pathname = usePathname();
 
-  const isProfileRoute = pathname === `/profile/${uid}`;
+  const isProfileRoute = pathname === `/myprofile/${uid}`;
+  const paramsRoute = pathname === `/profile/${uid}`;
 
   const handleSignOut = async () => {
     await signOutWithGoogle();
@@ -100,7 +100,7 @@ const NavRight = () => {
 
       {!isProfileRoute && (
         <Link
-          href={`/profile/${uid}`}
+          href={`/myprofile/${uid}`}
           className="px-4 py-2 scale-100 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent font-medium rounded-md whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
         >
           Profile

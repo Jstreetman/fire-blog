@@ -1,29 +1,35 @@
 "use client";
-import { useState, useEffect } from "react";
-import { app } from "@/app/firebase/config";
+import React, { useState, useEffect } from "react";
+import FeedNavbar from "@/components/Feed/FeedNavbar/FeedNavbar";
+import { OtherProfileDesignDetails } from "./OtherProfileDesignDetails";
 import { getAuth } from "firebase/auth";
-import { FeedPostCard } from "@/components/Feed/FeedPostCard/FeedPostCard";
-import { MyProfileDesignDetails } from "./MyProfileDesignDetails";
-import { getPosts } from "@/app/firebase/get/getposts";
+import {
+  getBlogPosts,
+  getOtherUserPosts,
+  getPosts,
+} from "@/app/firebase/get/getposts";
+import { app } from "@/app/firebase/config";
+import { useParams } from "next/navigation";
 import { PostDetails } from "@/components/Feed/Post/FeedPostDetails";
 
-export const MyProfile = ({ params }: { params: { slug: string } }) => {
+export const OtherProfile = () => {
   const [postDetails, setPostDetails] = useState(null);
   const auth = getAuth(app);
   const userId = auth.currentUser?.uid;
+  let otherUid = useParams().slug;
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getPosts(userId);
+      const data = await getBlogPosts(otherUid);
       setPostDetails(data);
     };
     fetchData();
-  }, [postDetails, userId]);
-
+  }, [postDetails, otherUid]);
+  console.log("other profile", useParams().slug);
   return (
-    <div className="">
-      <MyProfileDesignDetails params={params} />
-      <FeedPostCard />
+    <div>
+      <FeedNavbar />
+      <OtherProfileDesignDetails params={useParams()} />
       <div className="mt-3">
         {postDetails?.posts.map((post) => (
           <PostDetails

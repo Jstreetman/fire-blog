@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CgAddR } from "react-icons/cg";
 import { getAuth } from "firebase/auth";
 import { app } from "@/app/firebase/config";
-import createPost from "@/app/firebase/post/blog/create";
+import createPost, { createBlogPost } from "@/app/firebase/post/blog/create";
 
 const PostModal = ({ onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +25,7 @@ const PostModal = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await createPost(userId, post, title);
+    await createBlogPost(userId, post, title);
     setPost("");
     setTitle("");
 

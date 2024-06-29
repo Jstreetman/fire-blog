@@ -1,9 +1,9 @@
 import { MyProfile } from "./MyProfileDesigns/MyProfile";
 
-export const MyProfileDetails = () => {
+export const MyProfileDetails = ({ params }: { params: { slug: string } }) => {
   return (
     <div>
-      <MyProfile />
+      <MyProfile params={params} />
     </div>
   );
 };

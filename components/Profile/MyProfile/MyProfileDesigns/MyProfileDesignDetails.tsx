@@ -1,21 +1,24 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
-import coverPicDefault from "../../../../public/coverpicdefault.jpeg";
-import { MdAccountCircle, MdCreate, MdCameraAlt } from "react-icons/md";
+import coverPicDefault from "../../../../public/coverpicdefault.avif";
+import { MdAccountCircle } from "react-icons/md";
 import { app } from "@/app/firebase/config";
-
 import { getAuth } from "firebase/auth";
 import { getProfile } from "@/app/firebase/get/getprofile";
 import updateUser from "@/app/firebase/put/updateprofile";
 import { updateCoverPic } from "@/app/firebase/put/updateprofilephotos";
 import { updateProfilePic } from "@/app/firebase/put/updateprofilephotos";
 import deleteProfile from "@/app/firebase/delete/profile/deleteprofile";
-import { useRouter } from "next/navigation";
-import { CardGridAnimation } from "@/components/Animations/CardGrid";
+import { useRouter, useParams } from "next/navigation";
 import LoadingAnimation from "@/components/Animations/LoadingAnimation";
-export const MyProfileDesignDetails = () => {
+import { PostDetails } from "@/components/Feed/Post/FeedPostDetails";
+export const MyProfileDesignDetails = ({
+  params,
+}: {
+  params: { slug: string };
+}) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -23,12 +26,12 @@ export const MyProfileDesignDetails = () => {
       transition={{ duration: 1, ease: "easeInOut", delay: 0.5 }}
       className=" py-5"
     >
-      <ProfileDesignCard />
+      <ProfileDesignCard params={useParams()} />
     </motion.div>
   );
 };
 
-const ProfileDesignCard = () => {
+const ProfileDesignCard = ({ params }: { params: { slug: string } }) => {
   const [userDetails, setUserDetails] = useState(null);
   const auth = getAuth(app);
   const userId = auth.currentUser?.uid;
@@ -46,15 +49,24 @@ const ProfileDesignCard = () => {
     useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   // Fetch user details and update state
+  const otherUid = params.slug;
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getProfile(userId);
-      setUserDetails(data);
+      try {
+        const data = await getProfile(userId);
+        setUserDetails(data);
+
+        if (params.slug !== userId) {
+          router.push(`/myprofile/${userId}`);
+        } else if (params.slug === userId) {
+          console.log("else");
+        }
+      } catch (error) {}
     };
 
     fetchData();
-  }, [userId, router]); // Ensure useEffect runs when userId changes
+  }, [userId, otherUid, params.slug, router]); // Ensure useEffect runs when userId changes
 
   // Render loading state if userDetails is null
   if (!userDetails) {
@@ -111,30 +123,6 @@ const ProfileDesignCard = () => {
     input.click();
   };
 
-  // const handleOpenModal = async () => {
-  //   setIsLoading(true);
-
-  //   setIsOpenModal(true);
-
-  //   // Handle file input
-  //   const input = document.createElement("input");
-  //   input.type = "file";
-  //   input.accept = "image/*";
-  //   input.onchange = async (e: any) => {
-  //     const file = e.target.files[0];
-  //     setSelectedFile(file);
-
-  //     // Upload file to Firebase Storage
-
-  //     if (file) {
-  //       const data = updateCoverPic(userId, file);
-  //       setUserDetails(data);
-  //       //router.refresh();
-  //     }
-  //   };
-  //   input.click();
-  // };
-  // Function to handle modal open/close
   const handleModalOpen = () => {
     setIsModalOpen(true);
   };
@@ -272,75 +260,60 @@ const ProfileDesignCard = () => {
   // Once userDetails is available, render the user details
   return (
     <div className="mx-auto bg-gradient-to-br from-white/20 to-white/5 backdrop-blur rounded-lg lg:w-3/5 md:w-3/4 sm:w-4/5">
-      {isRefreshing ? (
-        <LoadingAnimation />
-      ) : (
-        <div>
-          {" "}
-          <div className="w-full">
-            <div
-              className="flex flex-col  p-3  bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg h-64 "
-              style={{
-                backgroundImage: `url(${
-                  userDetails?.cover && userDetails.cover.startsWith("http")
-                    ? userDetails.cover
-                    : coverPicDefault
-                })`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
-            >
-              <div className="flex ">
-                <MdCameraAlt
-                  onClick={handleOpenModal}
-                  className=" w-8 h-8 rounded-full border-[1px] border-white/30 hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all  "
-                />
-              </div>
-              <div className="relative flex justify-center items-center">
-                <div className="flex items-end">
-                  {userDetails.image ? (
-                    <Image
-                      onClick={handleOpenProfilePicModal}
-                      src={userDetails.image}
-                      alt="Profile Picture"
-                      className="object-cover h-32 w-132 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                      width={128}
-                      height={128}
-                    />
-                  ) : (
-                    <MdAccountCircle
-                      onClick={handleOpenProfilePicModal}
-                      className="object-cover h-32 w-32 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                      width={128}
-                      height={128}
-                    />
-                  )}
-                </div>
-              </div>
-              <h1 className="text-3xl font-bold text-center">
-                {userDetails.fullName}
-              </h1>{" "}
-            </div>
-            <div className="p-5 flex flex-col">
-              <div className="flex justify-end">
-                <MdCreate
-                  className="w-8 h-8 rounded-full hover:bg-white/35 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
-                  onClick={handleModalOpen}
-                />
-              </div>
-              <h1 className="text-2xl font-bold">{userDetails.username}</h1>
-              <p className="text-sm inline-block">{userDetails.bio}</p>
-              <h6 className="text-xs inline-block">
-                Joined: {userDetails.dateCreated}
-              </h6>
-              <h6>Followers: 0 {userDetails.followers}</h6>
-              <h6>Following: 0 {userDetails.following}</h6>
-            </div>
-          </div>
-          <AnimatePresence>{isModalOpen && modalContent}</AnimatePresence>
+      <div className="w-full  h-auto">
+        <div className="w-full h-full flex flex-col">
+          {userDetails.cover ? (
+            <Image
+              src={userDetails?.cover}
+              className=" object-cover object-center w-full h-56 rounded-lg scale-100 hover:cursor-pointer hover:scale-105 active:scale-100 transition-all"
+              alt="Profile"
+              onClick={handleOpenModal}
+              width={500}
+              height={500}
+            />
+          ) : (
+            <Image
+              src={coverPicDefault}
+              className=" object-cover object-center w-full h-48 rounded-lg scale-100 hover:cursor-pointer hover:scale-105 active:scale-100 transition-all"
+              alt="Profile"
+              width={500}
+              onClick={handleOpenModal}
+              height={500}
+            />
+          )}
+
+          {userDetails.image ? (
+            <Image
+              onClick={handleOpenProfilePicModal}
+              src={userDetails.image}
+              alt="Profile Picture"
+              className="object-cover h-40 w-40 mx-auto -mt-16 rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+              width={128}
+              height={128}
+            />
+          ) : (
+            <MdAccountCircle
+              onClick={handleOpenProfilePicModal}
+              className="object-cover h-32 w-32 mx-auto rounded-full border-[1px] border-blue-500 scale-100 hover:cursor-pointer hover:scale-110 active:scale-95 transition-all"
+              width={128}
+              height={128}
+            />
+          )}
         </div>
-      )}
+        <div className="w-full p-5 flex flex-col justify-center items-center">
+          <h1 className="text-4xl font-bold mb-5">
+            {userDetails?.fullName.charAt(0).toUpperCase() +
+              userDetails?.fullName.slice(1)}
+          </h1>
+          <p className="text-xl font-bold">
+            {userDetails?.username.charAt(0).toUpperCase() +
+              userDetails?.username.slice(1)}
+          </p>
+          <p className="text-gray-500 foreground text-sm">{userDetails?.bio}</p>
+        </div>
+      </div>
     </div>
   );
 };
+
+//  <AnimatePresence>{isModalOpen && modalContent}</AnimatePresence>
