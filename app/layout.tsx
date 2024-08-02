@@ -9,6 +9,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Fireblog",
   description: "your blog, your way",
+  icons: {
+    icon: "./favicon.ico",
+    apple: "../public/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

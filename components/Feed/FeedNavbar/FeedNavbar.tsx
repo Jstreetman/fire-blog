@@ -15,7 +15,7 @@ const FeedNavbar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
 
   useEffect(() => {
-    if (isSuccess) router.push("/feed");
+    if (isSuccess) router.push("/signin");
   }, [isSuccess]);
 
   return (
