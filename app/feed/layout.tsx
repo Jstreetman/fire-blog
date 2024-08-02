@@ -1,3 +1,6 @@
+import FeedNavbar from "@/components/Feed/FeedNavbar/FeedNavbar";
+import FeedSideBar from "@/components/Feed/FeedSideBar";
+import MobileBottombar from "@/components/Feed/MobileBottomBar";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -8,14 +11,23 @@ export const metadata: Metadata = {
   description: "Dashboard",
 };
 
-export default function RootLayout({
+export default function FeedLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="flex  h-screen">
+          <div className="w-full md:flex z-20">
+            <FeedNavbar />
+            <FeedSideBar />
+            {children}
+            <MobileBottombar />
+          </div>
+        </div>
+      </body>
     </html>
   );
 }

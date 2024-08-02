@@ -1,117 +1,101 @@
 "use client";
-import React, { ReactNode, useState } from "react";
-import { SiGoogle } from "react-icons/si";
+import React, { useEffect } from "react";
+
 import { FiArrowLeft } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
-import { FaFire } from "react-icons/fa";
+
+import { useToast } from "@/components/ui/use-toast";
+import appLogo from "../../public/assets/images/applogo.svg";
+import { SigninValidation } from "@/app/lib/validation";
+import { Input } from "../ui/input";
+import Loader from "../Animations/LoadingAnimation";
+import { useSignInAccount } from "@/lib/react-queries/queries";
+import Image from "next/image";
+
 import Link from "next/link";
 
-import { auth } from "@/app/firebase/config";
-import { GridAnimation } from "../Animations/GridAnimation";
-import signIn, { signInWithGoogle } from "@/app/firebase/auth/authsignin";
 import { useRouter } from "next/navigation";
-import { SignInError, SignUpError } from "@/enums/AuthEnums";
+import { useUserContext } from "@/context/AuthContext";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { GridAnimation } from "../Animations/GridAnimation";
 
 export const AuthSignIn = () => {
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setShowSuccessMessage] = useState("");
+  const { toast } = useToast();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const router = useRouter();
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    checkuserAuth();
+  }, []);
 
-    const email = (e.target as any).elements.email.value;
-    const password = (e.target as any).elements.password.value;
-
-    if (!email || !password) {
-      setErrorMessage(SignInError.EmptyFields);
-      setShowErrorModal(true);
-      return;
+  const checkuserAuth = async () => {
+    const isLoggedIn = await checkAuthUser();
+    if (isLoggedIn) {
+      router.push("/feed");
     }
+  };
+  const form = useForm<z.infer<typeof SigninValidation>>({
+    resolver: zodResolver(SigninValidation),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { mutateAsync: signInAccount, isPending: isSigningInUser } =
+    useSignInAccount();
+
+  const handleSignIn = async (user: z.infer<typeof SigninValidation>) => {
     try {
-      const { result, error } = await signIn(auth, email, password);
-      if (error) {
-        if (error === SignInError.InvalidEmail) {
-          setErrorMessage(SignInError.InvalidEmail);
-          console.log(SignInError.InvalidEmail);
-        } else if (error === SignInError.InvalidCredentials) {
-          setErrorMessage(SignInError.InvalidCredentials);
-          console.log(SignInError.InvalidCredentials);
-        } else {
-          setErrorMessage(SignInError.IncorrectPassword);
-          console.log(SignInError.IncorrectPassword);
-        }
-        setShowErrorModal(true);
+      // @ts-ignore
+      const session = await signInAccount(user);
+
+      router.push("/feed");
+
+      if (!session) {
+        return toast({
+          variant: "destructive",
+          title: "Sign In Failed",
+        });
       }
-      console.log("User signed in successfully");
-      router.refresh();
+      const isLoggedIn = await checkAuthUser();
+
+      if (isLoggedIn) {
+        form.reset();
+        router.push("/feed");
+        return toast({
+          title: "Sign In Successful",
+        });
+      } else {
+        return toast({
+          variant: "destructive",
+          title: "Sign In Failed",
+        });
+      }
+      // if (!isLoggedIn) {
+      //   toast({
+      //     title: "Sign In Failed",
+      //   });
+      //   return;
+      // }
     } catch (error) {
-      setErrorMessage(error.message.toString());
-      setShowErrorModal(true);
+      console.error(error);
     }
   };
 
-  const handleSignUpGoogle = async () => {
-    await signInWithGoogle();
-
-    router.push("/feed");
-  };
-
-  const Email = () => {
-    return (
-      <form onSubmit={handleSignIn}>
-        <div className="mb-3">
-          <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
-            Email
-          </label>
-          <input
-            id="email-input"
-            type="email"
-            name="email"
-            placeholder="Email..."
-            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-          />
-        </div>
-        <div className="mb-6">
-          <div className="mb-1.5 flex items-end justify-between">
-            <label htmlFor="password-input" className="block text-zinc-400">
-              Password
-            </label>
-            <a href="#" className="text-sm text-blue-400">
-              Forgot?
-            </a>
-          </div>
-          <input
-            id="password-input"
-            type="password"
-            name="password"
-            placeholder="••••••••••••"
-            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-          />
-        </div>
-        <SplashButton type="submit" className="w-full">
-          Sign In
-        </SplashButton>
-      </form>
-    );
-  };
-  const SocialOptions = () => (
-    <div>
-      <div className="mb-3 flex gap-3">
-        <BubbleButton
-          className="flex w-full justify-center py-3"
-          onClick={handleSignUpGoogle}
-        >
-          <SiGoogle />
-        </BubbleButton>
-      </div>
-    </div>
-  );
   return (
-    <div className="bg-zinc-950 py-20 text-zinc-200 selection:bg-zinc-600">
+    <div className=" py-20 text-zinc-200 selection:bg-zinc-600">
       <motion.div
         initial={{
           opacity: 0,
@@ -122,8 +106,7 @@ export const AuthSignIn = () => {
         transition={{
           duration: 1.25,
           ease: "easeInOut",
-        }}
-      >
+        }}>
         <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
@@ -145,37 +128,66 @@ export const AuthSignIn = () => {
           duration: 1.25,
           ease: "easeInOut",
         }}
-        className="relative z-10 mx-auto w-full max-w-xl p-4"
-      >
+        className="relative z-10 mx-auto w-full max-w-xl p-4">
         <Heading />
-
-        <SocialOptions />
-        <Or />
-        <Email />
-        <Terms />
-      </motion.div>
-      <AnimatePresence>
-        {showErrorModal && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          >
-            <div className="bg-red-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
-              <h2 className="text-xl font-semibold">Error</h2>
-              <p className="mt-2">{errorMessage}</p>
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="mt-4 underline"
-              >
-                Close
-              </button>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSignIn)}>
+            <div className="mb-3">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Email
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Email..."
+                        type="email"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="mb-6">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="••••••••••••"
+                        type="password"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <SplashButton type="submit" className="w-full">
+              {isSigningInUser || isUserLoading ? (
+                <div className="flex-center gap-2">
+                  <Loader /> Loading...
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </SplashButton>
+          </form>
+        </Form>
+      </motion.div>
       <GridAnimation />
     </div>
   );
@@ -198,29 +210,6 @@ const Heading = () => (
   </div>
 );
 
-const Or = () => {
-  return (
-    <div className="my-6 flex items-center gap-3">
-      <div className="h-[1px] w-full bg-zinc-700" />
-      <span className="text-zinc-400">OR</span>
-      <div className="h-[1px] w-full bg-zinc-700" />
-    </div>
-  );
-};
-
-const Terms = () => (
-  <p className="mt-9 text-xs text-zinc-400">
-    By signing in, you agree to our{" "}
-    <Link href="#" className="text-blue-400">
-      Terms & Conditions
-    </Link>{" "}
-    and{" "}
-    <Link href="#" className="text-blue-400">
-      Privacy Policy.
-    </Link>
-  </p>
-);
-
 const SplashButton = ({ children, className, ...rest }: ButtonProps) => {
   return (
     <button
@@ -228,8 +217,7 @@ const SplashButton = ({ children, className, ...rest }: ButtonProps) => {
         "rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70",
         className
       )}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   );
@@ -257,18 +245,17 @@ const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
         active:scale-100`,
         className
       )}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   );
 };
 
 const NavLogo = () => {
-  return <FaFire className="h-6 w-6 text-blue-400" />;
+  return <Image src={appLogo} alt="app logo" height={40} width={40} />;
 };
 
 type ButtonProps = {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;

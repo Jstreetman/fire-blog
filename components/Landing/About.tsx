@@ -1,12 +1,12 @@
 "use client";
 import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { AnimationProps } from "framer-motion";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { FiArrowLeft } from "react-icons/fi";
-import { FaFire } from "react-icons/fa";
+import appLogo from "../../public/assets/images/applogo.svg";
 import { CardGridAnimation } from "../Animations/CardGrid";
+import Image from "next/image";
 
 const About = () => {
   return (
@@ -21,8 +21,7 @@ const About = () => {
         transition={{
           duration: 1.25,
           ease: "easeInOut",
-        }}
-      >
+        }}>
         <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
@@ -54,10 +53,9 @@ const Content = () => {
           ease: "backInOut",
           delay: 0.3,
         }}
-        className="z-20"
-      >
+        className="z-20">
         <div className="py-20 z-20 flex flex-col justify-center items-center">
-          <FaFire className="text-9xl text-blue-500" />
+          <Image src={appLogo} alt="logo" width={250} height={250} />
           <h1 className="py-10 text-3xl font-bold ">
             About Fire<span className="text-blue-500">blog</span>
           </h1>
@@ -78,8 +76,7 @@ const Content = () => {
           transition: { duration: 4, ease: "easeInOut", delay: 0.8 },
         }}
         viewport={{ once: true }}
-        className="py-32 z-20 flex flex-col justify-center items-center"
-      >
+        className="py-32 z-20 flex flex-col justify-center items-center">
         <h1 className="py-10 text-3xl font-bold text-center">Mission</h1>
         <p className="text-2xl text-center">
           {" "}
@@ -96,8 +93,7 @@ const Content = () => {
           transition: { duration: 3.5, ease: "easeInOut", delay: 0.2 },
         }}
         viewport={{ once: true }}
-        className="py-32 z-20 flex flex-col justify-center items-center"
-      >
+        className="py-32 z-20 flex flex-col justify-center items-center">
         <h1 className="py-10 text-3xl font-bold text-center">Who are we</h1>
         <p className="text-2xl text-center">
           {" "}
@@ -133,8 +129,7 @@ const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
         active:scale-100`,
         className
       )}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   );

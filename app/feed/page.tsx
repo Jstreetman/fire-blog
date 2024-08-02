@@ -1,9 +1,11 @@
-import { HomePage } from "@/components/Feed/HomePage";
+import { GridBeamAnimation } from "@/components/Animations/GridBeamAnimation";
+import HomePage from "@/components/Feed/HomePage";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <div>
+    <section className="flex flex-1 h-full">
       <HomePage />
-    </div>
+      <GridBeamAnimation />
+    </section>
   );
 }

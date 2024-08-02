@@ -1,60 +1,101 @@
 "use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { FaFire } from "react-icons/fa";
 import { FiArrowLeft } from "react-icons/fi";
 import { twMerge } from "tailwind-merge";
-import { auth } from "@/app/firebase/config";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { GridAnimation } from "../Animations/GridAnimation";
-import { SignUpError } from "../../enums/AuthEnums";
-import { Success } from "../../enums/AuthEnums";
-import signUp from "@/app/firebase/auth/authsignup";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useToast } from "@/components/ui/use-toast";
+import appLogo from "../../public/assets/images/applogo.svg";
+import { GridBeamAnimation } from "../Animations/GridBeamAnimation";
+import { useUserContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { SignUpValidationSchema } from "@/app/lib/validation";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import Loader from "../Animations/LoadingAnimation";
+import {
+  useCreateUserAccount,
+  useSignInAccount,
+} from "@/lib/react-queries/queries";
+import Image from "next/image";
 export const AuthSignUp = () => {
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setShowSuccessMessage] = useState("");
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
-
+  const { toast } = useToast();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const router = useRouter();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = (e.target as any).elements.email.value;
-    const password = (e.target as any).elements.password.value;
+  useEffect(() => {
+    checkUser();
+  }, []);
 
-    if (!email || !password) {
-      setErrorMessage(SignUpError.EmptyFields);
-      setShowErrorModal(true);
-      return;
+  const checkUser = async () => {
+    const isLoggedIn = await checkAuthUser();
+    if (isLoggedIn) {
+      router.push("/feed");
     }
+  };
 
+  const form = useForm<z.infer<typeof SignUpValidationSchema>>({
+    resolver: zodResolver(SignUpValidationSchema),
+    defaultValues: {
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+    },
+  });
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
+    useCreateUserAccount();
+
+  const { mutateAsync: signInAccount, isPending: isSigningInUser } =
+    useSignInAccount();
+
+  const handleSignUp = async (
+    values: z.infer<typeof SignUpValidationSchema>
+  ) => {
     try {
-      const { result, error } = await signUp(auth, email, password);
-      if (error) {
-        if (error === SignUpError.EmailAlreadyInUse) {
-          setErrorMessage(SignUpError.EmailAlreadyInUse);
-          console.log(SignUpError.EmailAlreadyInUse);
-        } else if (error === SignUpError.WeakPassword) {
-          setErrorMessage(SignUpError.WeakPassword);
-          console.log(SignUpError.WeakPassword);
-        } else if (error === SignUpError.InvalidCredentials) {
-          setErrorMessage(SignUpError.InvalidCredentials);
-          console.log(SignUpError.InvalidCredentials);
-        } else {
-          setErrorMessage(error.message);
-        }
-        setShowErrorModal(true);
-      } else {
+      // @ts-ignore
+
+      const newUser = await createUserAccount(values);
+      if (!newUser) {
+        return toast({
+          title: "Sign Up Failed",
+        });
+      }
+
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (!session) {
+        return toast({
+          title: "Something went wrong with your session. Please try again",
+        });
+      }
+      const isSignedIn = await checkAuthUser();
+
+      if (isSignedIn) {
+        form.reset();
         router.push("/feed");
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Failed to sign in. Please try again",
+        });
+        return;
       }
     } catch (error) {
-      setErrorMessage(error.message);
-      setShowErrorModal(true);
+      console.log(error);
     }
   };
   return (
@@ -69,8 +110,7 @@ export const AuthSignUp = () => {
         transition={{
           duration: 1.25,
           ease: "easeInOut",
-        }}
-      >
+        }}>
         <Link href="/" className="absolute z-20 left-4 top-6 text-sm">
           <BubbleButton>
             <FiArrowLeft />
@@ -92,42 +132,114 @@ export const AuthSignUp = () => {
           duration: 1.25,
           ease: "easeInOut",
         }}
-        className="relative z-10 mx-auto w-full max-w-xl p-4 "
-      >
+        className="relative z-10 mx-auto w-full max-w-xl p-4 ">
         <Heading />
 
-        <form onSubmit={handleSignUp}>
-          <Email />
-          <Terms />
-          <SplashButton type="submit" className="w-full">
-            Sign Up
-          </SplashButton>
-        </form>
-      </motion.div>
-      <GridAnimation />
-
-      <AnimatePresence>
-        {showErrorModal && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          >
-            <div className="bg-red-500 p-6 rounded-lg shadow-lg text-white max-w-sm w-full mx-4">
-              <h2 className="text-xl font-semibold">Error</h2>
-              <p className="mt-2">{errorMessage}</p>
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="mt-4 underline"
-              >
-                Close
-              </button>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSignUp)}>
+            <div className="mb-3">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Name..."
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+            <div className="mb-3">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Create Username
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Create Username..."
+                        type="text"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mb-3">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Email
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Email..."
+                        type="email"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mb-6">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="mb-1.5 block text-zinc-400">
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="••••••••••••"
+                        type="password"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Terms />
+            <SplashButton type="submit" className="w-full">
+              {isCreatingAccount || isSigningInUser || isUserLoading ? (
+                <div className="flex-center gap-2">
+                  <Loader /> Loading...
+                </div>
+              ) : (
+                "Sign Up"
+              )}
+            </SplashButton>
+          </form>
+        </Form>
+      </motion.div>
+      <GridBeamAnimation />
     </div>
   );
 };
@@ -149,37 +261,6 @@ const Heading = () => (
   </div>
 );
 
-const Email = () => {
-  return (
-    <>
-      <div className="mb-3">
-        <label htmlFor="email-input" className="mb-1.5 block text-zinc-400">
-          Email
-        </label>
-        <input
-          id="email-input"
-          type="email"
-          name="email"
-          placeholder="Email..."
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
-      <div className="mb-6">
-        <label htmlFor="password-input" className="block text-zinc-400">
-          Password
-        </label>
-        <input
-          id="password-input"
-          type="password"
-          name="password"
-          placeholder="••••••••••••"
-          className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-blue-700"
-        />
-      </div>
-    </>
-  );
-};
-
 const Terms = () => (
   <p className="mt-9 text-xs text-zinc-400">
     By signing up, you agree to our{" "}
@@ -200,8 +281,7 @@ const SplashButton = ({ children, className, ...rest }: ButtonProps) => {
         "rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70 mt-4",
         className
       )}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   );
@@ -229,15 +309,14 @@ const BubbleButton = ({ children, className, ...rest }: ButtonProps) => {
         active:scale-100`,
         className
       )}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   );
 };
 
 const NavLogo = () => {
-  return <FaFire className="h-6 w-6 text-blue-400" />;
+  return <Image src={appLogo} alt="app logo" height={40} width={40} />;
 };
 
 type ButtonProps = {

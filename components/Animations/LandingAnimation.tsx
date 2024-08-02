@@ -1,17 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { AnimationProps, motion } from "framer-motion";
-import { Cards } from "../Cards/Cards";
 import Navbar from "../Landing/Navbar";
 import { HeroLanding } from "../Landing/Hero/HeroLanding";
-import { HeroFooter } from "../Footer/HeroFooter";
+import { useRouter } from "next/navigation";
+import { useUserContext } from "@/context/AuthContext";
 
 export const LandingAnimation = () => {
   return (
     <section className="relative overflow-hidden">
       <Content />
       <Navbar />
-      {/* <HeroFooter /> */}
 
       <Beams />
       <GradientGrid />
@@ -23,8 +22,7 @@ const Content = () => {
   return (
     <div
       className=" z-20 mx-auto flex max-w-6xl h-screen flex-col items-center justify-center px-4  md:px-8 md:py-8 "
-      style={{ minHeight: `calc(100vh - 2rem)` }}
-    >
+      style={{ minHeight: `calc(100vh - 2rem)` }}>
       <HeroLanding />
     </div>
   );
@@ -102,12 +100,15 @@ const Beams = () => {
 };
 
 const useWindowSize = () => {
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const router = useRouter();
   const [windowSize, setWindowSize] = useState<WindowSize>({
     width: undefined,
     height: undefined,
   });
 
   useEffect(() => {
+    checkuserAuth();
     const handleResize = () =>
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
 
@@ -119,6 +120,13 @@ const useWindowSize = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const checkuserAuth = async () => {
+    const isLoggedIn = await checkAuthUser();
+    if (isLoggedIn) {
+      router.push("/feed");
+    }
+  };
 
   return windowSize;
 };
@@ -163,8 +171,7 @@ const GradientGrid = () => {
         duration: 2.5,
         ease: "easeInOut",
       }}
-      className="absolute inset-0 z-0"
-    >
+      className="absolute inset-0 z-0">
       <div
         style={{
           backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='rgb(30 58 138 / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`,

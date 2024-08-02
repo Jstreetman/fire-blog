@@ -1,6 +1,6 @@
 import { ActualLanding } from "@/components/Landing/Hero/ActualLanding";
 
-export default async function Home() {
+export default function Home() {
   return (
     <div>
       <ActualLanding />

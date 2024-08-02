@@ -1,0 +1,208 @@
+"use client";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useRouter, useParams } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import ProfileUploader from "./ProfileUploader";
+import { ProfileValidation } from "@/app/lib/validation";
+import { useUserContext } from "@/context/AuthContext";
+import { useGetUserById, useUpdateUser } from "@/lib/react-queries/queries";
+import LoadingAnimation from "../Animations/LoadingAnimation";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
+
+const UpdateProfile = () => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const { id } = useParams<{ id: string }>();
+  const { user, setUser } = useUserContext();
+  const form = useForm<z.infer<typeof ProfileValidation>>({
+    resolver: zodResolver(ProfileValidation),
+    defaultValues: {
+      file: [],
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      bio: user.bio || "",
+    },
+  });
+
+  // Queries
+  const { data: currentUser } = useGetUserById(id || "");
+  const { mutateAsync: updateUser, isPending: isLoadingUpdate } =
+    useUpdateUser();
+
+  if (!currentUser)
+    return (
+      <div className="flex-center w-full h-full">
+        <LoadingAnimation />
+      </div>
+    );
+
+  // Handler
+  const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
+    const updatedUser = await updateUser({
+      userId: currentUser.$id,
+      name: value.name,
+      bio: value.bio,
+      file: value.file,
+      imageUrl: currentUser.imageUrl,
+      imageId: currentUser.imageId,
+    });
+
+    if (!updatedUser) {
+      toast({
+        title: `Update user failed. Please try again.`,
+      });
+    }
+
+    setUser({
+      ...user,
+      name: updatedUser?.name,
+      bio: updatedUser?.bio,
+      imageUrl: updatedUser?.imageUrl,
+    });
+    return router.push(`/profile/${id}`);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
+      className="flex flex-1">
+      <div className="common-container">
+        <div className="flex-start gap-3 justify-start w-full max-w-5xl">
+          <img
+            src="/assets/icons/edit.svg"
+            width={36}
+            height={36}
+            alt="edit"
+            className="invert-white"
+          />
+          <h2 className="h3-bold md:h2-bold text-left w-full">Edit Profile</h2>
+        </div>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleUpdate)}
+            className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
+            <FormField
+              control={form.control}
+              name="file"
+              render={({ field }) => (
+                <FormItem className="flex">
+                  <FormControl>
+                    <ProfileUploader
+                      fieldChange={field.onChange}
+                      mediaUrl={currentUser.imageUrl}
+                    />
+                  </FormControl>
+                  <FormMessage className="shad-form_message" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" className="shad-input" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      className="shad-input"
+                      {...field}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      className="shad-input"
+                      {...field}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Bio</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="shad-textarea custom-scrollbar"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="shad-form_message" />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-4 items-center justify-end">
+              <Button
+                type="button"
+                className="shad-button_dark_4"
+                onClick={() => router.push("/feed")}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 ring-2 ring-blue-500/50 ring-offset-2 ring-offset-zinc-950 transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70"
+                disabled={isLoadingUpdate}>
+                {isLoadingUpdate && <LoadingAnimation />}
+                Update Profile
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </motion.div>
+  );
+};
+
+export default UpdateProfile;
