@@ -67,8 +67,6 @@ export async function signInAccount(user: { email: string; password: string }) {
   try {
     const session = await account.createEmailSession(user.email, user.password);
 
-    console.log("api.ts", account.listSessions);
-
     return session;
   } catch (error) {
     console.error(error);

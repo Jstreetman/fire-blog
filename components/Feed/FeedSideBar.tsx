@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { NavLink } from "@/app/types";
 import { useRouter } from "next/navigation";
 import { sidebarLinks } from "@/constants";
@@ -16,18 +17,11 @@ const FeedSideBar = () => {
   const pathname = usePathname();
   const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
 
-  const { mutate: signOut } = useSignOutAccount();
+  const { mutate: signOut, isSuccess } = useSignOutAccount();
 
-  const handleSignOut = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    signOut();
-    setIsAuthenticated(false);
-    setUser(INITIAL_USER);
-
-    router.push("/signin");
-  };
+  useEffect(() => {
+    if (isSuccess) router.push("/signin");
+  }, [isSuccess]);
 
   return (
     <motion.nav
@@ -104,7 +98,7 @@ const FeedSideBar = () => {
       <Button
         variant="ghost"
         className="shad-button_ghost"
-        onClick={(e) => handleSignOut(e)}>
+        onClick={() => signOut()}>
         <Image
           src="/assets/icons/logout.svg"
           alt="logout"

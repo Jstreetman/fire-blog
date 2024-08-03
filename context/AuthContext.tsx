@@ -76,15 +76,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const cookieFallback = localStorage.getItem("cookieFallback");
-      console.log("cookie", cookieFallback);
+      const authToken = localStorage.getItem(
+        process.env.NEXT_PUBLIC_APPWRITE_COOKIE_AUTH_TOKEN_NAME
+      );
+      // console.log("cookie", authToken);
       if (
-        cookieFallback === "[]" ||
-        cookieFallback === null ||
-        cookieFallback === undefined
+        authToken ===
+          process.env.NEXT_PUBLIC_APPWRITE_COOKIE_AUTH_TOKEN_EMPTY ||
+        authToken === process.env.NEXT_PUBLIC_APPWRITE_COOKIE_AUTH_TOKEN_NULL ||
+        authToken ===
+          process.env.NEXT_PUBLIC_APPWRITE_COOKIE_AUTH_TOKEN_UNDEFINED
       ) {
         router.push("/signin");
-        console.log(cookieFallback);
+        // console.log(cookieFallback);
       }
     } catch (error) {
       console.log("error in authcontext", error);
