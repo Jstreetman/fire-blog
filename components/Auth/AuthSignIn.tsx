@@ -59,9 +59,10 @@ export const AuthSignIn = () => {
   const handleSignIn = async (user: z.infer<typeof SigninValidation>) => {
     try {
       // @ts-ignore
-      const session = await signInAccount(user);
-
-      router.push("/feed");
+      const session = await signInAccount({
+        email: user.email,
+        password: user.password,
+      });
 
       if (!session) {
         return toast({
@@ -83,12 +84,6 @@ export const AuthSignIn = () => {
           title: "Sign In Failed",
         });
       }
-      // if (!isLoggedIn) {
-      //   toast({
-      //     title: "Sign In Failed",
-      //   });
-      //   return;
-      // }
     } catch (error) {
       console.error(error);
     }

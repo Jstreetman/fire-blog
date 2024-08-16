@@ -1,5 +1,4 @@
-import { ID, Query } from "appwrite";
-
+import { Client, ID, Query } from "appwrite";
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { UpdatePost, NewPost, NewUser, UpdateUser } from "../types/index";
 
