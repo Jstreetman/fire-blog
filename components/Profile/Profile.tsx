@@ -79,8 +79,8 @@ const Profile = () => {
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0, x: -1000 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: -1000 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: "anticipate" }}
               className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
               {currentUser.bio}
@@ -89,8 +89,8 @@ const Profile = () => {
 
           <div className="flex justify-center gap-4">
             <motion.div
-              initial={{ opacity: 0, x: 1000 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 1000 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: "anticipate" }}
               className={`${user.id !== currentUser.$id && "hidden"}`}>
               <Link
@@ -110,8 +110,8 @@ const Profile = () => {
               </Link>
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, x: 1000 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 1000 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: "anticipate" }}
               className={`${user.id === id && "hidden"}`}>
               <Button
@@ -124,8 +124,8 @@ const Profile = () => {
         </div>
       </div>
       <motion.div
-        initial={{ opacity: 0, x: 1000 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 1000 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.5, ease: "anticipate" }}>
         <PostList posts={currentUser.posts} showUser={false} />
       </motion.div>
